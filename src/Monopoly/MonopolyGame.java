@@ -3,7 +3,7 @@ package Monopoly;
 public class MonopolyGame {
     private Tile[] board;
     private Player[] players;
-    int currentPlayer;
+    private int currentPlayer;
 
     public MonopolyGame() {
         board = Tile.buildBoard();
@@ -27,25 +27,25 @@ public class MonopolyGame {
         players[currentPlayer].playTurn();
     }
 
-    public Player[] getPlayers() {
+    Player[] getPlayers() {
         return players;
     }
 
-    public Tile tileAt(int index) {
+    Tile tileAt(int index) {
         return board[index];
     }
 
-    public void payRent(Player payer, PropertyTile titleDeed) {
+    void payRent(Player payer, PropertyTile titleDeed) {
         payer.deductBalance(titleDeed.getRent());
         titleDeed.getOwner().addBalance(titleDeed.getRent());
     }
 
-    public void payRent(Player payer, UtilityTile titleDeed, int roll) {
+    void payRent(Player payer, UtilityTile titleDeed, int roll) {
         payer.deductBalance(titleDeed.getRent(roll));
         titleDeed.getOwner().addBalance(titleDeed.getRent(roll));
     }
 
-    public void payRent(Player payer, RailroadTile titleDeed) {
+    void payRent(Player payer, RailroadTile titleDeed) {
         payer.deductBalance(titleDeed.getRent());
         titleDeed.getOwner().addBalance(titleDeed.getRent());
     }

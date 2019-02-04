@@ -2,13 +2,18 @@ package Monopoly;
 
 import java.util.ArrayList;
 
-public class Logger {
-    public static final ArrayList<String> logs = new ArrayList<>();
+class Logger {
+    private static final ArrayList<String> logs = new ArrayList<>();
 
-    public static void log(String message) {
+    static void log(String message) {
         logs.add(message);
 
         if (Prefs.printLogsWhenCreated)
             System.out.println(message);
+    }
+
+    @SuppressWarnings("unused")
+    static ArrayList<String> getLogs() {
+        return logs;
     }
 }

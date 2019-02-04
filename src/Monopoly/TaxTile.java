@@ -1,7 +1,7 @@
 package Monopoly;
 
-public class TaxTile extends Tile {
-    public TaxTile() {
+class TaxTile extends Tile {
+    TaxTile() {
         super(TileType.TAX, "Tax");
     }
 }

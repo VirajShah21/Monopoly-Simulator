@@ -1,10 +1,7 @@
 package Monopoly;
-import java.util.ArrayList;
 
-public class JailTile extends Tile {
-    ArrayList<Player> playersInJail;
-    public JailTile() {
+class JailTile extends Tile {
+    JailTile() {
         super(TileType.JAIL, "Jail");
-        playersInJail = new ArrayList<>();
     }
 }

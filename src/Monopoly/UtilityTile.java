@@ -1,12 +1,10 @@
 package Monopoly;
 
 public class UtilityTile extends Tile {
-    int propertyValue;
     private Player owner;
 
     UtilityTile(String name) {
         super(TileType.UTILITY, name);
-        propertyValue = 150;
     }
 
     public boolean isMonopoly() {
@@ -17,29 +15,30 @@ public class UtilityTile extends Tile {
         return count == 2;
     }
 
-    public int getRent(int diceRoll) {
+    int getRent(int diceRoll) {
         return isMonopoly() ? diceRoll * 10 : diceRoll * 4;
     }
 
-    public boolean isOwned() {
+    boolean isOwned() {
         return owner != null;
     }
 
-    public void buy(Player player) {
+    void buy(Player player) {
         owner = player;
         player.deductBalance(getPropertyValue());
         player.addAsset(this);
     }
 
+    @SuppressWarnings("unused")
     public void foreclose() {
         owner = null;
     }
 
-    public int getPropertyValue() {
+    int getPropertyValue() {
         return 150;
     }
 
-    public Player getOwner() {
+    Player getOwner() {
         return owner;
     }
 }

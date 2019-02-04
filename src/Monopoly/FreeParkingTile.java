@@ -1,21 +1,21 @@
 package Monopoly;
 
-public class FreeParkingTile extends Tile {
+class FreeParkingTile extends Tile {
     private int pool;
 
-    public FreeParkingTile() {
+    FreeParkingTile() {
         super(TileType.FREE_PARKING, "Free Parking");
     }
 
-    public void addToPool(int amount) {
+    void addToPool(int amount) {
         pool += amount;
     }
 
-    public void clearPool() {
+    void clearPool() {
         pool = 0;
     }
 
-    public int getPoolAmount() {
+    int getPoolAmount() {
         return pool;
     }
 }

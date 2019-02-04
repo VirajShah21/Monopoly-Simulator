@@ -1,7 +1,7 @@
 package Monopoly;
 
-public class GoTile extends Tile {
-    public GoTile() {
+class GoTile extends Tile {
+    GoTile() {
         super(TileType.GO, "GO");
     }
 }
