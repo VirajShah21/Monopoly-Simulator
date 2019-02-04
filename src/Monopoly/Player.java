@@ -1,6 +1,14 @@
 package Monopoly;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
+
+/**
+ * A monopoly Player class which provides features for managing a players balance, smartly evading bankruptcy,
+ * managing properties/assets, using get out of jail free cards, tracking their turns in jail, knowing their position
+ * on the board.
+ */
 
 @SuppressWarnings("unused")
 public class Player {
@@ -10,7 +18,13 @@ public class Player {
     private MonopolyGame game;
     private boolean inJail, isBankrupt;
 
-    Player(String name, MonopolyGame thisGame) {
+    /**
+     * Create a new Player and attach it to a monopoly game.
+     *
+     * @param name     The name of the new player
+     * @param thisGame Game to which the player should be attached to
+     */
+    public Player(String name, MonopolyGame thisGame) {
         this.name = name;
         position = 0;
         balance = 1500;
@@ -22,52 +36,106 @@ public class Player {
         isBankrupt = false;
     }
 
-    MonopolyGame getGame() {
+    /**
+     * Get the game which the player belongs to.
+     *
+     * @return The game which the player is attached to
+     */
+    public MonopolyGame getGame() {
         return game;
     }
 
-    void addGetOutOfJailCard() {
+    /**
+     * Add a get out of jail free card to the players possession.
+     */
+    public void addGetOutOfJailCard() {
         getOutOfJailCards++;
     }
 
+    /**
+     * Get the number of get out of jail free cards.
+     *
+     * @return The number of get out of jail free cards.
+     */
     public int getNumberOfGetOutOfJailCards() {
         return getOutOfJailCards;
     }
 
-    int getPosition() {
+    /**
+     * Get the position of this player. (0 <= position <= 4)
+     *
+     * @return The position of the player.
+     */
+    public int getPosition() {
         return position;
     }
 
-    void setPosition(int position) {
+    /**
+     * Set this players position on the game board.
+     *
+     * @param position The position on the game board.
+     */
+    public void setPosition(int position) {
         this.position = position;
     }
 
+    /**
+     * Get the balance of this player.
+     *
+     * @return The balance of this player.
+     */
     public int getBalance() {
         return balance;
     }
 
-    void goToJail() {
+    /**
+     * Send this player to the jail.
+     */
+    public void goToJail() {
         inJail = true;
         setPosition(10);
     }
 
+    /**
+     * Checks if a player is in jail.
+     *
+     * @return true if the player is in jail; false otherwise.
+     */
     public boolean isInJail() {
         return inJail;
     }
 
-    ArrayList<Tile> getAssets() {
+    /**
+     * Get the assets belonging to this player.
+     *
+     * @return The ArrayList of assets belonging to this player.
+     */
+    public ArrayList<Tile> getAssets() {
         return assets;
     }
 
-    void addAsset(Tile asset) {
+    /**
+     * Add an asset to the player's list of assets
+     *
+     * @param asset A Tile which acts as a title deed.
+     */
+    public void addAsset(Tile asset) {
         assets.add(asset);
     }
 
+    /**
+     * Remove an asset at a specified index
+     *
+     * @param index Index in the asset list to remove an asset from.
+     */
     public void removeAsset(int index) {
         assets.remove(index);
     }
 
-    void playTurn() {
+    /**
+     * Play the player's turn; this method takes everything into account when playing a turn.
+     */
+    public void playTurn() {
         int[] roll = Dice.roll2();
         int moveAmount = roll[0] + roll[1];
 
@@ -145,6 +213,12 @@ public class Player {
         }
     }
 
+    /**
+     * Find the least desired asset in an asset list. Used when selling properties.
+     *
+     * @return The least desired asset belonging to the player.
+     */
+    @Nullable
     private Tile leastDesiredAsset() {
         int[] rankings = new int[assets.size()];
         int lowestIndex;
@@ -190,7 +264,12 @@ public class Player {
         }
     }
 
-    void deductBalance(int amount) {
+    /**
+     * Dedcut balance from user. If tthey do not have enough money, they will sell get out of jail free cards and properties.
+     *
+     * @param amount
+     */
+    public void deductBalance(int amount) {
         balance -= amount;
 
         while (balance < 0 && getOutOfJailCards == 0) {
@@ -221,20 +300,39 @@ public class Player {
         }
     }
 
-    void addBalance(int amount) {
+    /**
+     * Add a balance to the players holdings.
+     */
+    public void addBalance(int amount) {
         balance += amount;
     }
 
+    /**
+     * Pays money from one player to another.
+     *
+     * @param other  The player to recieve money from this player.
+     * @param amount The amount of money to transfer.
+     */
     public void payTo(Player other, int amount) {
         deductBalance(amount);
         other.addBalance(amount);
         Logger.log(String.format("%s paid %s $%d", this, other, amount));
     }
 
+    /**
+     * Checks if the player is bankrupt.
+     *
+     * @return true if the player is bankrupt; false otherwise.
+     */
     public boolean isBankrupt() {
         return isBankrupt;
     }
 
+    /**
+     * Returns a string-safe version of this Player object.
+     *
+     * @return String: "Name ($balance)" <br>&nbsp;&nbsp;&nbsp;&nbsp; Ex: North ($1500)
+     */
     public String toString() {
         return String.format("%s ($%d)", name, balance);
     }
