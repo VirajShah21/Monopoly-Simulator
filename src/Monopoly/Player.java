@@ -5,12 +5,10 @@ import java.util.ArrayList;
 @SuppressWarnings("unused")
 public class Player {
     private String name;
-    private int position, balance;
+    private int position, balance, getOutOfJailCards, turnsInJail;
     private ArrayList<Tile> assets;
     private MonopolyGame game;
-    private int getOutOfJailCards;
-    private boolean inJail;
-    private int turnsInJail;
+    private boolean inJail, isBankrupt;
 
     Player(String name, MonopolyGame thisGame) {
         this.name = name;
@@ -21,6 +19,7 @@ public class Player {
         getOutOfJailCards = 0;
         inJail = false;
         turnsInJail = 0;
+        isBankrupt = false;
     }
 
     MonopolyGame getGame() {
@@ -37,6 +36,10 @@ public class Player {
 
     int getPosition() {
         return position;
+    }
+
+    void setPosition(int position) {
+        this.position = position;
     }
 
     public int getBalance() {
@@ -69,7 +72,7 @@ public class Player {
         int moveAmount = roll[0] + roll[1];
 
 
-        Logger.log(String.format("%s rolled a %d and %d. Total: %d", name, roll[0], roll[1], moveAmount));
+        Logger.log(String.format("%s rolled a %d and %d. Total: %d", this, roll[0], roll[1], moveAmount));
 
         if (inJail) {
             turnsInJail++;
@@ -78,15 +81,15 @@ public class Player {
                 inJail = false;
                 turnsInJail = 0;
                 Logger.log(String.format("%s rolled double %d's. Player will move %d spaces from jail",
-                        name, roll[0], roll[0] * 2));
+                        this, roll[0], roll[0] * 2));
             } else if (turnsInJail == 4) {
                 inJail = false;
                 turnsInJail = 0;
                 Logger.log(String.format("%s rolled for the fourth time in jail. Moving %d spaces\n",
-                        name, roll[0] + roll[1]));
+                        this, roll[0] + roll[1]));
                 return;
             } else {
-                Logger.log(String.format("%s is still stuck in jail.\n", name));
+                Logger.log(String.format("%s is still stuck in jail.\n", this));
                 return;
             }
         }
@@ -95,7 +98,7 @@ public class Player {
         if (position > 39) {
             position -= 40;
             addBalance(200);
-            Logger.log(String.format("%s moved to %s", name, game.tileAt(position)));
+            Logger.log(String.format("%s moved to %s", this, game.tileAt(position)));
         }
 
         Tile currTile = game.tileAt(position);
@@ -179,10 +182,15 @@ public class Player {
             if (rankings[i] < lowestIndex)
                 lowestIndex = i;
 
-        return assets.get(lowestIndex);
+        try {
+            return assets.get(lowestIndex);
+        } catch (IndexOutOfBoundsException e) {
+            return null;
+        }
     }
 
     void deductBalance(int amount) {
+        System.out.println(amount);
         balance -= amount;
 
         while (balance < 0 || getOutOfJailCards == 0) {
@@ -193,17 +201,21 @@ public class Player {
         while (balance < 0 || assets.size() == 0) {
             Tile getRid = leastDesiredAsset();
 
+            if (getRid == null) {
+                balance = -1;
+                isBankrupt = true;
+                Logger.log(String.format("%s is bankrupt!", this));
+                return;
+            }
+
             if (getRid.TYPE == Tile.TileType.PROPERTY) {
                 PropertyTile p = (PropertyTile) getRid;
-                addBalance(p.getPropertyValue());
                 p.foreclose();
             } else if (getRid.TYPE == Tile.TileType.UTILITY) {
                 UtilityTile u = (UtilityTile) getRid;
-                addBalance(u.getPropertyValue());
                 u.foreclose();
             } else if (getRid.TYPE == Tile.TileType.RAILROAD) {
                 RailroadTile r = (RailroadTile) getRid;
-                addBalance(r.getPropertyValue());
                 r.foreclose();
             }
         }
@@ -213,14 +225,14 @@ public class Player {
         balance += amount;
     }
 
-    void setPosition(int position) {
-        this.position = position;
-    }
-
     public void payTo(Player other, int amount) {
         deductBalance(amount);
         other.addBalance(amount);
         Logger.log(String.format("%s paid %s $%d", this, other, amount));
+    }
+
+    public boolean isBankrupt() {
+        return isBankrupt;
     }
 
     public String toString() {

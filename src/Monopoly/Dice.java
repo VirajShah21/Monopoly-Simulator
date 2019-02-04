@@ -2,7 +2,7 @@ package Monopoly;
 
 class Dice {
     static int roll1() {
-        return (int) (Math.random() * 7);
+        return (int) (Math.random() * 6) + 1;
     }
 
     static int[] roll2() {

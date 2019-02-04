@@ -30,6 +30,7 @@ public class PropertyTile extends Tile {
 
     @SuppressWarnings("unused")
     public void foreclose() {
+        owner.addBalance(propertyValue);
         isOwned = false;
         owner = null;
     }

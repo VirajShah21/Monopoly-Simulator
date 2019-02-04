@@ -21,6 +21,14 @@ public class MonopolyGame {
 
         if (currentPlayer >= 4)
             currentPlayer = 0;
+
+        try {
+            if (players[currentPlayer].isBankrupt())
+                nextPlayer();
+        } catch (StackOverflowError e) {
+            System.out.println("Every player is now bankrupt.");
+            System.exit(0);
+        }
     }
 
     public void playTurn() {

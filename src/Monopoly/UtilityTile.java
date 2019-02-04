@@ -31,7 +31,9 @@ public class UtilityTile extends Tile {
 
     @SuppressWarnings("unused")
     public void foreclose() {
+        owner.addBalance(150);
         owner = null;
+
     }
 
     int getPropertyValue() {

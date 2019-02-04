@@ -28,6 +28,7 @@ public class RailroadTile extends Tile {
     }
 
     public void foreclose() {
+        owner.addBalance(200);
         owner = null;
     }
 
