@@ -7,7 +7,6 @@ package Monopoly;
 public class PropertyTile extends Tile {
     private int[] rents;
     private int propertyValue;
-    private boolean isOwned;
     private Player owner;
     private int houses;
     private int group;
@@ -24,7 +23,6 @@ public class PropertyTile extends Tile {
         super(TileType.PROPERTY, propertyName);
         this.propertyValue = propertyValue;
         rents = rentAmounts;
-        isOwned = false;
         houses = 0;
         this.group = group;
     }
@@ -33,7 +31,7 @@ public class PropertyTile extends Tile {
      * @return True if the property is owned; false otherwise
      */
     boolean isOwned() {
-        return isOwned;
+        return owner != null;
     }
 
     /**
@@ -42,8 +40,7 @@ public class PropertyTile extends Tile {
      * @param player The Player object which is purchasing the property
      */
     void buy(Player player) {
-        if (!isOwned) {
-            isOwned = true;
+        if (!isOwned()) {
             owner = player;
             player.deductBalance(getPropertyValue());
             player.addAsset(this);
@@ -52,13 +49,12 @@ public class PropertyTile extends Tile {
 
     /**
      * Forecloses a property. Gives the player their money bank, strips Player object of ownership,
-     * and gives the property back to the bank
+     * and gives the property back to the bank.
      */
     @SuppressWarnings("unused")
     public void foreclose() {
         owner.addBalance(propertyValue);
-
-        isOwned = false;
+        owner.removeAsset(owner.getAssets().indexOf(this));
         owner = null;
     }
 
