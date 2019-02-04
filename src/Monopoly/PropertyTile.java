@@ -1,7 +1,7 @@
 package Monopoly;
 
 /**
- * The PropertyTile is an subclass of Tile. It contains property's associated more specifically with those of colored
+ * The PropertyTile is an subclass of Tile. It contains fields associated more specifically with those of colored
  * properties on a Monopoly game board.
  */
 public class PropertyTile extends Tile {
@@ -58,6 +58,9 @@ public class PropertyTile extends Tile {
         owner = null;
     }
 
+    /**
+     * @return The number of houses belonging to this property
+     */
     int getHouses() {
         if (houses > 4) {
             return 0;
@@ -66,22 +69,38 @@ public class PropertyTile extends Tile {
         }
     }
 
+    /**
+     * @return True if a hotel belongs to the property; false otherwise
+     */
     boolean hasHotel() {
         return houses == 5;
     }
 
+    /**
+     * @return The price of a property
+     */
     int getPropertyValue() {
         return propertyValue;
     }
 
+    /**
+     * @return The Player object of the Player who owns this property
+     */
     Player getOwner() {
         return owner;
     }
 
+    /**
+     * @return The color group (as an integer) to which this property belongs to
+     */
     int getGroupNumber() {
         return group;
     }
 
+    /**
+     * @return Get the rent amount which is due when someone lands on the property;
+     * this depends on the number of houses/hotels, and whether the property is a monopoly
+     */
     int getRent() {
         if (isMonopoly()) {
             if (houses == 0)
@@ -93,6 +112,11 @@ public class PropertyTile extends Tile {
         }
     }
 
+    /**
+     * Checks to see if the property owner owns a monopoly in this property's color group
+     *
+     * @return True if property belongs to a monopoly set; false otherwise
+     */
     public boolean isMonopoly() {
         int setCount = 0;
         for (Tile t : getOwner().getAssets())
@@ -106,8 +130,12 @@ public class PropertyTile extends Tile {
             return setCount == 3;
     }
 
+    /**
+     * @return The name of the property with the number of houses or hotels;
+     * if no buildings are on the property then just the property name will show up
+     */
     public String toString() {
-        String append = houses <= 4 && houses > 0 ? " (" + houses + " houses)" : null;
+        String append = houses <= 4 && houses > 0 ? " (" + houses + " houses)" : (hasHotel() ? " (w/ Hotel)" : null);
         return String.format("%s%s", NAME, append == null ? "" : append);
     }
 }

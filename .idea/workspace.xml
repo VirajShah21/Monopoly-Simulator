@@ -2,10 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0901c481-e563-45c4-8058-cd1ba86fd6e5" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Monopoly/PropertyTile.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Monopoly/PropertyTile.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Monopoly/RailroadTile.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Monopoly/RailroadTile.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Monopoly/UtilityTile.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Monopoly/UtilityTile.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -43,40 +40,16 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Monopoly/PropertyTile.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="151">
-              <caret line="41" column="28" selection-start-line="41" selection-start-column="28" selection-end-line="41" selection-end-column="28" />
+            <state relative-caret-position="1260">
+              <caret line="136" column="29" selection-start-line="136" selection-start-column="29" selection-end-line="136" selection-end-column="29" />
               <folding>
-                <element signature="e#1095#1096#0" expanded="true" />
-                <element signature="e#1125#1126#0" expanded="true" />
+                <element signature="method#PropertyTile#0;class#PropertyTile#0" />
                 <element signature="method#buy#0;class#PropertyTile#0" />
-                <element signature="e#1994#1995#0" expanded="true" />
-                <element signature="e#2060#2061#0" expanded="true" />
-                <element signature="e#2113#2114#0" expanded="true" />
-                <element signature="e#2169#2170#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Monopoly/TaxTile.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="45">
-              <caret line="3" column="4" selection-start-line="3" selection-start-column="4" selection-end-line="3" selection-end-column="4" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Monopoly/RailroadTile.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="42">
-              <caret line="31" column="59" selection-start-line="31" selection-start-column="59" selection-end-line="31" selection-end-column="59" />
-              <folding>
-                <element signature="e#1046#1047#0" expanded="true" />
-                <element signature="e#1072#1073#0" expanded="true" />
-                <element signature="e#1097#1098#0" expanded="true" />
-                <element signature="e#1125#1126#0" expanded="true" />
+                <element signature="method#foreclose#0;class#PropertyTile#0" />
+                <element signature="method#getHouses#0;class#PropertyTile#0" />
+                <element signature="method#getRent#0;class#PropertyTile#0" />
+                <element signature="method#isMonopoly#0;class#PropertyTile#0" />
+                <element signature="method#toString#0;class#PropertyTile#0" />
               </folding>
             </state>
           </provider>
@@ -141,8 +114,8 @@
         <option value="$PROJECT_DIR$/src/Monopoly/Logger.java" />
         <option value="$PROJECT_DIR$/src/Monopoly/MonopolyGame.java" />
         <option value="$PROJECT_DIR$/src/Monopoly/RailroadTile.java" />
-        <option value="$PROJECT_DIR$/src/Monopoly/PropertyTile.java" />
         <option value="$PROJECT_DIR$/src/Monopoly/UtilityTile.java" />
+        <option value="$PROJECT_DIR$/src/Monopoly/PropertyTile.java" />
       </list>
     </option>
   </component>
@@ -227,7 +200,7 @@
     <property name="Repository.Attach.Sources" value="false" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1549323074906" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1549324165865" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="project.structure.last.edited" value="Project" />
@@ -279,12 +252,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1549062210035</updated>
-      <workItem from="1549062211544" duration="47212000" />
+      <workItem from="1549062211544" duration="48299000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="47212000" />
+    <option name="totallyTimeSpent" value="48299000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -359,16 +332,6 @@
     <entry file="file://$PROJECT_DIR$/Docs/index-files/index-1.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-533" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Monopoly/Tile.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-690">
-          <caret line="20" column="31" selection-start-line="20" selection-start-column="31" selection-end-line="20" selection-end-column="31" />
-          <folding>
-            <element signature="e#383#410#0" expanded="true" />
-          </folding>
-        </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Monopoly/Card.java">
@@ -549,18 +512,29 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/Monopoly/Tile.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="357">
+          <caret line="94" column="18" selection-start-line="94" selection-start-column="18" selection-end-line="94" selection-end-column="18" />
+          <folding>
+            <element signature="e#3978#3979#0" expanded="true" />
+            <element signature="e#4005#4006#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/Monopoly/PropertyTile.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="151">
-          <caret line="41" column="28" selection-start-line="41" selection-start-column="28" selection-end-line="41" selection-end-column="28" />
+        <state relative-caret-position="1260">
+          <caret line="136" column="29" selection-start-line="136" selection-start-column="29" selection-end-line="136" selection-end-column="29" />
           <folding>
-            <element signature="e#1095#1096#0" expanded="true" />
-            <element signature="e#1125#1126#0" expanded="true" />
+            <element signature="method#PropertyTile#0;class#PropertyTile#0" />
             <element signature="method#buy#0;class#PropertyTile#0" />
-            <element signature="e#1994#1995#0" expanded="true" />
-            <element signature="e#2060#2061#0" expanded="true" />
-            <element signature="e#2113#2114#0" expanded="true" />
-            <element signature="e#2169#2170#0" expanded="true" />
+            <element signature="method#foreclose#0;class#PropertyTile#0" />
+            <element signature="method#getHouses#0;class#PropertyTile#0" />
+            <element signature="method#getRent#0;class#PropertyTile#0" />
+            <element signature="method#isMonopoly#0;class#PropertyTile#0" />
+            <element signature="method#toString#0;class#PropertyTile#0" />
           </folding>
         </state>
       </provider>
