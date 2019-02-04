@@ -98,8 +98,9 @@ public class Player {
         if (position > 39) {
             position -= 40;
             addBalance(200);
-            Logger.log(String.format("%s moved to %s", this, game.tileAt(position)));
         }
+
+        Logger.log(String.format("%s moved to %s", this, game.tileAt(position)));
 
         Tile currTile = game.tileAt(position);
         if (currTile.TYPE == Tile.TileType.PROPERTY) {
@@ -190,15 +191,14 @@ public class Player {
     }
 
     void deductBalance(int amount) {
-        System.out.println(amount);
         balance -= amount;
 
-        while (balance < 0 || getOutOfJailCards == 0) {
+        while (balance < 0 && getOutOfJailCards == 0) {
             getOutOfJailCards--;
             addBalance(50);
         }
 
-        while (balance < 0 || assets.size() == 0) {
+        while (balance < 0 && assets.size() == 0) {
             Tile getRid = leastDesiredAsset();
 
             if (getRid == null) {
