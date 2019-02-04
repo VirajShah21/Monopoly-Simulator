@@ -29,7 +29,7 @@ public class PropertyTile extends Tile {
     }
 
     @SuppressWarnings("unused")
-    public void forclose() {
+    public void foreclose() {
         isOwned = false;
         owner = null;
     }
@@ -59,20 +59,7 @@ public class PropertyTile extends Tile {
     }
 
     int getRent() {
-        int setCount = 0;
-        boolean isMonopoly;
-        for (Tile t : getOwner().getAssets())
-            if (t.getType() == Tile.TileType.PROPERTY)
-                if (((PropertyTile) t).getGroupNumber() == getGroupNumber())
-                    setCount++;
-
-        if (getGroupNumber() == 1 || getGroupNumber() == 8)
-            isMonopoly = setCount == 2;
-        else
-            isMonopoly = setCount == 3;
-
-
-        if (isMonopoly) {
+        if (isMonopoly()) {
             if (houses == 0)
                 return rents[0] * 2;
             else
@@ -80,6 +67,19 @@ public class PropertyTile extends Tile {
         } else {
             return rents[0];
         }
+    }
+
+    public boolean isMonopoly() {
+        int setCount = 0;
+        for (Tile t : getOwner().getAssets())
+            if (t.getType() == Tile.TileType.PROPERTY)
+                if (((PropertyTile) t).getGroupNumber() == getGroupNumber())
+                    setCount++;
+
+        if (getGroupNumber() == 1 || getGroupNumber() == 8)
+            return setCount == 2;
+        else
+            return setCount == 3;
     }
 
     public String toString() {

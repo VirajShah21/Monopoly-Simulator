@@ -141,8 +141,72 @@ public class Player {
         }
     }
 
+    private Tile leastDesiredAsset() {
+        int[] rankings = new int[assets.size()];
+        int lowestIndex;
+
+        for (int i = 0; i < rankings.length; i++) {
+            Tile asset = assets.get(i);
+
+            if (asset.TYPE == Tile.TileType.UTILITY) {
+                rankings[i] = 7;
+                if (((UtilityTile) asset).isMonopoly())
+                    rankings[i] -= 2;
+
+            } else if (asset.TYPE == Tile.TileType.PROPERTY) {
+                rankings[i] = 5;
+                if (((PropertyTile) asset).isMonopoly()) {
+                    rankings[i] -= 2;
+
+                    if (((PropertyTile) asset).hasHotel())
+                        rankings[i] -= 3;
+                    else if (((PropertyTile) asset).getHouses() > 2)
+                        rankings[i] -= 2;
+                    else if (((PropertyTile) asset).getHouses() > 0) {
+                        rankings[i] -= 1;
+                    }
+                }
+
+            } else if (asset.TYPE == Tile.TileType.RAILROAD) {
+                rankings[i] = 5;
+                rankings[i] -= ((RailroadTile) asset).railroadsInSet();
+            }
+        }
+
+
+        lowestIndex = 0;
+        for (int i = 0; i < rankings.length; i++)
+            if (rankings[i] < lowestIndex)
+                lowestIndex = i;
+
+        return assets.get(lowestIndex);
+    }
+
     void deductBalance(int amount) {
         balance -= amount;
+
+        while (balance < 0 || getOutOfJailCards == 0) {
+            getOutOfJailCards--;
+            addBalance(50);
+        }
+
+        while (balance < 0 || assets.size() == 0) {
+            Tile getRid = leastDesiredAsset();
+
+            if (getRid.TYPE == Tile.TileType.PROPERTY) {
+                PropertyTile p = (PropertyTile) getRid;
+                addBalance(p.getPropertyValue());
+                p.foreclose();
+            } else if (getRid.TYPE == Tile.TileType.UTILITY) {
+                UtilityTile u = (UtilityTile) getRid;
+                addBalance(u.getPropertyValue());
+                u.foreclose();
+            } else if (getRid.TYPE == Tile.TileType.RAILROAD) {
+                RailroadTile r = (RailroadTile) getRid;
+                addBalance(r.getPropertyValue());
+                r.foreclose();
+            }
+        }
     }
 
     void addBalance(int amount) {

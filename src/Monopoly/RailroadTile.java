@@ -31,15 +31,28 @@ public class RailroadTile extends Tile {
         owner = null;
     }
 
+    public int railroadsInSet() {
+        int setCount = 0;
+        for (Tile t : getOwner().getAssets())
+            if (t.getType() == TileType.RAILROAD)
+                setCount++;
+
+        return setCount;
+    }
+
+    public boolean isMonopoly() {
+        return railroadsInSet() == 4;
+    }
+
     int getPropertyValue() {
         return 200;
     }
 
-    boolean isOwned() {
-        return owner != null;
-    }
-
     Player getOwner() {
         return owner;
+    }
+
+    boolean isOwned() {
+        return owner != null;
     }
 }
