@@ -9,7 +9,7 @@ class Simulator {
             new BufferedReader(new InputStreamReader(System.in));
 
     public static void main(String[] args) throws IOException {
-        Prefs.printLogsWhenCreated = true;
+        Logger.printLogsWhenCreated = true;
         MonopolyGame game = new MonopolyGame();
         while (true) {
             System.out.print("How many turns would you like to play: ");
