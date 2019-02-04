@@ -2,23 +2,45 @@ package Monopoly;
 
 import java.util.ArrayList;
 
+/**
+ * The Card class provides a container to hold data about Chance and Community Chest cards, and allows
+ * for operations on to be done on a Player object.
+ */
 public class Card {
     private String message, call;
 
+    /**
+     * Initialize a new Card object
+     *
+     * @param message The message which is read on the card
+     * @param call    The actions to call when a player picks up the card
+     */
     public Card(String message, String call) {
         this.message = message;
         this.call = call;
     }
 
+    /**
+     * @return The message read on the chace/community chest card
+     */
     public String getMessage() {
         return message;
     }
 
+    /**
+     * @return The call to actions to be processed when a player picks up the card
+     */
     public String getCall() {
         return call;
     }
 
+    /**
+     * Runs Chance/Community Chest actions on the player once a player picks up the card
+     *
+     * @param player The player which picks up this card
+     */
     void pickup(Player player) {
+        Logger.log(String.format("%s picked up the card: %s", player, this));
         String[] calls = call.split(";");
 
         for (int i = 0; i < calls.length; i++) {
@@ -146,7 +168,10 @@ public class Card {
         }
     }
 
-    static final Card[] communityChestDeck = {
+    /**
+     * The deck of community chest cards
+     */
+    public static final Card[] communityChestDeck = {
             new Card("Advance to Go. Collect $200.", "goto 0; earn 200;"),
             new Card("Bank error in your favor. Collect $200.", "earn 200;"),
             new Card("Doctor fees. Pay $50.", "pay 50;"),
@@ -166,6 +191,9 @@ public class Card {
             new Card("You inherit $100.", "earn 100")
     };
 
+    /**
+     * The deck of chance cards
+     */
     static final Card[] chanceDeck = {
             new Card("Advance to Go. Collect $200.", "goto 0; earn 200;"),
             new Card("Advance to Illinois Avenue. If you pass Go, collect $200.", "advance 24;"),
@@ -185,9 +213,21 @@ public class Card {
             new Card("You have won a crossword competition. Collect $100.", "earn 100")
     };
 
-
+    /**
+     * Return a random card from any deck (array) of cards; usually community chest/chance
+     *
+     * @param deck A deck (array) of Card objects
+     * @return A random card object from the deck provided
+     */
     static Card pickRandomCard(Card[] deck) {
         int index = (int) (Math.random() * deck.length);
         return deck[index];
+    }
+
+    /**
+     * @return The String representation of the Card object
+     */
+    public String toString() {
+        return message;
     }
 }
