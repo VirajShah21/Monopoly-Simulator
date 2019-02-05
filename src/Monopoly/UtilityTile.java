@@ -81,4 +81,10 @@ public class UtilityTile extends Tile {
     public Player getOwner() {
         return owner;
     }
+
+    public void transferOwnership(Player newOwner) {
+        owner.removeAsset(owner.getAssets().indexOf(this));
+        owner = newOwner;
+        owner.addAsset(this);
+    }
 }

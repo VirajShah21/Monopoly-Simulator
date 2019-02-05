@@ -250,6 +250,15 @@ public class Player {
                 ((FreeParkingTile) game.tileAt(20)).addToPool(100);
             }
         }
+
+        for (Player p : game.getPlayers()) {
+            TradeBroker.createOffer(this, p);
+        }
+
+        if (roll[0] == roll[1]) {
+            Logger.log(String.format("%s rolled doubles (%d). %s will roll again.", this, roll[0], this));
+            playTurn();
+        }
     }
 
     /**
@@ -316,31 +325,29 @@ public class Player {
             addBalance(50);
         }
 
+        TradeBroker.sortAssetsByWorth(this);
         while (balance < 0 && assets.size() == 0) {
-            Tile getRid = leastDesiredAsset();
-
-            if (getRid == null) {
-                balance = -1;
+            try {
+                Tile getRid = assets.get(0);
+                if (getRid.TYPE == Tile.TileType.PROPERTY) {
+                    PropertyTile p = (PropertyTile) getRid;
+                    p.foreclose();
+                } else if (getRid.TYPE == Tile.TileType.UTILITY) {
+                    UtilityTile u = (UtilityTile) getRid;
+                    u.foreclose();
+                } else if (getRid.TYPE == Tile.TileType.RAILROAD) {
+                    RailroadTile r = (RailroadTile) getRid;
+                    r.foreclose();
+                }
+            } catch (NullPointerException e) {
                 isBankrupt = true;
-                Logger.log(String.format("%s is bankrupt!", this));
-                return;
-            }
-
-            if (getRid.TYPE == Tile.TileType.PROPERTY) {
-                PropertyTile p = (PropertyTile) getRid;
-                p.foreclose();
-            } else if (getRid.TYPE == Tile.TileType.UTILITY) {
-                UtilityTile u = (UtilityTile) getRid;
-                u.foreclose();
-            } else if (getRid.TYPE == Tile.TileType.RAILROAD) {
-                RailroadTile r = (RailroadTile) getRid;
-                r.foreclose();
             }
         }
     }
 
     /**
      * Add a balance to the players holdings.
+     *
      * @param amount The amount to be added to the player's balance
      */
     public void addBalance(int amount) {
@@ -366,6 +373,16 @@ public class Player {
      */
     public boolean isBankrupt() {
         return isBankrupt;
+    }
+
+    public int getPersonalEvaluation() {
+        int eval = 0;
+        for (Tile t : assets)
+            eval += TradeBroker.getAssetWorth(t);
+
+        eval += getOutOfJailCards * 50 + balance;
+
+        return eval;
     }
 
     /**

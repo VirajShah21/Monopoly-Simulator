@@ -60,6 +60,12 @@ public class RailroadTile extends Tile {
         return owner;
     }
 
+    public void transferOwnership(Player newOwner) {
+        owner.removeAsset(owner.getAssets().indexOf(this));
+        owner = newOwner;
+        owner.addAsset(this);
+    }
+
     public boolean isOwned() {
         return owner != null;
     }

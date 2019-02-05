@@ -1,7 +1,8 @@
 package Monopoly;
 
-import javax.rmi.CORBA.Util;
-import java.util.*;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
 
 
 /**
@@ -9,13 +10,20 @@ import java.util.*;
  * accept offers, deny offers, etc
  */
 public class TradeBroker {
-    public static int getAssetWorth(Tile tile) {
+    /**
+     * Get the worth of a player holding onto an asset
+     *
+     * @param tile The tile which is in question; If not PropertyTile, RailroadTile, or UtilityTile,
+     *             then the tiles worth will be 0
+     * @return The worth of a tile to the player who owns it
+     */
+    public static int getAssetWorth(@NotNull Tile tile) {
         int eval = 0;
 
         if (tile.TYPE == Tile.TileType.PROPERTY) {
             PropertyTile property = (PropertyTile) tile;
 
-            eval = property.getPropertyValue();
+            eval = property.getPropertyValue() + 200;
             if (property.isMonopoly()) {
                 eval *= 2;
 
@@ -42,28 +50,77 @@ public class TradeBroker {
         } else if (tile.TYPE == Tile.TileType.UTILITY) {
             UtilityTile property = (UtilityTile) tile;
 
-            eval = property.getPropertyValue();
+            eval = property.getPropertyValue() + 200;
 
             if (property.isMonopoly())
                 eval *= 2;
         } else if (tile.TYPE == Tile.TileType.RAILROAD) {
             RailroadTile property = (RailroadTile) tile;
 
-            eval = property.getPropertyValue() + (int)(property.getRent() / 200.0 * 4);
+            eval = property.getPropertyValue() + (int) (property.getRent() / 200.0 * 4) + 200;
+        }
+
+        return eval - 100;
+    }
+
+    public static int getAssetWorthToOther(@NotNull Tile tile, Player player) {
+        int eval = 0;
+
+        if (tile.TYPE == Tile.TileType.PROPERTY) {
+            PropertyTile property = (PropertyTile) tile;
+
+            eval = property.getPropertyValue() + 200;
+            if (property.isMonopoly()) {
+                eval = 0;
+            }
+        } else if (tile.TYPE == Tile.TileType.UTILITY) {
+            UtilityTile property = (UtilityTile) tile;
+
+            eval = property.getPropertyValue() + 200;
+
+            if (property.isMonopoly())
+                eval *= 2;
+        } else if (tile.TYPE == Tile.TileType.RAILROAD) {
+            RailroadTile property = (RailroadTile) tile;
+
+            eval = property.getPropertyValue() + (int) (property.getRent() / 200.0 * 4) + 200;
         }
 
         return eval;
     }
 
-    public static void sortAssetsByWorth(Player player) {
+    /**
+     * Sort the assets in an instance of a Player object by the worth of holding onto the asset
+     *
+     * @param player The player whose assets are to be sorted
+     */
+    public static void sortAssetsByWorth(@NotNull Player player) {
         ArrayList<Tile> assets = player.getAssets();
+        if (assets.size() > 1) {
+            for (int i = 0; i < assets.size() - 1; i++) {
+                for (int j = i + 1; j < assets.size(); j++) {
+                    if (getAssetWorth(assets.get(i)) > getAssetWorth(assets.get(j))) {
+                        Tile tmp = assets.get(i);
+                        assets.set(i, assets.get(j));
+                        assets.set(j, tmp);
+                    }
+                }
+            }
+        }
+    }
 
-        for (int i = 0; i < assets.size() - 1; i++) {
-            for (int j = i + 1; j < assets.size(); j++) {
-                if (getAssetWorth(assets.get(i)) > getAssetWorth(assets.get(j))) {
-                    Tile tmp = assets.get(i);
-                    assets.set(i, assets.get(j));
-                    assets.set(j, tmp);
+    public static void createOffer(Player sender, Player reciever) {
+        sortAssetsByWorth(sender);
+
+        if (sender.getAssets().size() >= 2 && reciever.getAssets().size() >= 2) {
+            for (Tile t : reciever.getAssets()) {
+                if (getAssetWorthToOther(t, sender) >= getAssetWorth(sender.getAssets().get(0))) {
+                    TradeOffer trade = new TradeOffer(sender, sender.getAssets().get(0), 0, reciever, t, 0);
+                    trade.sendOffer();
+                    if (trade.isFairTrade()) {
+                        trade.execute();
+                        break;
+                    }
                 }
             }
         }

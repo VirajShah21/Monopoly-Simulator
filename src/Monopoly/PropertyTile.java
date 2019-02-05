@@ -153,6 +153,12 @@ public class PropertyTile extends Tile {
             return setCount == 3;
     }
 
+    public void transferOwnership(Player newOwner) {
+        owner.removeAsset(owner.getAssets().indexOf(this));
+        owner = newOwner;
+        owner.addAsset(this);
+    }
+
     /**
      * @return The name of the property with the number of houses or hotels;
      * if no buildings are on the property then just the property name will show up

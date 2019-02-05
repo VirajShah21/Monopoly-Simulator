@@ -8,7 +8,7 @@ class Simulator {
             new BufferedReader(new InputStreamReader(System.in));
 
     public static void main(String[] args) throws IOException {
-        Logger.printLogsWhenCreated = true;
+//        Logger.printLogsWhenCreated = true;
         MonopolyGame game = new MonopolyGame();
         while (true) {
             System.out.print("How many turns would you like to play: ");
@@ -17,6 +17,8 @@ class Simulator {
             for (int turnNumber = 0; turnNumber < turnsToPlay; turnNumber++) {
                 game.nextPlayer();
                 game.playTurn();
+                if (Logger.printLogsWhenCreated)
+                    System.out.println();
             }
 
             System.out.println("\n");
@@ -26,10 +28,8 @@ class Simulator {
             System.out.println();
 
             for (Player person : game.getPlayers()) {
-                System.out.println(person);
+                System.out.println(person + " => " + person.getPersonalEvaluation() + " (" + person.getAssets() + ")");
             }
         }
-
-
     }
 }
