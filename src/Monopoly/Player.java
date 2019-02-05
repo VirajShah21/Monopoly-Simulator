@@ -101,7 +101,7 @@ public class Player {
     }
 
     /**
-     * Get the position of this player. (0 <= position <= 4)
+     * Get the position of this player. (0 &le; position &le; 4)
      *
      * @return The position of the player.
      */
@@ -306,7 +306,7 @@ public class Player {
     /**
      * Dedcut balance from user. If tthey do not have enough money, they will sell get out of jail free cards and properties.
      *
-     * @param amount
+     * @param amount The amount to be deducted from the player's balance
      */
     public void deductBalance(int amount) {
         balance -= amount;
@@ -341,6 +341,7 @@ public class Player {
 
     /**
      * Add a balance to the players holdings.
+     * @param amount The amount to be added to the player's balance
      */
     public void addBalance(int amount) {
         balance += amount;
