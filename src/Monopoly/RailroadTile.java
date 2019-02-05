@@ -1,5 +1,8 @@
 package Monopoly;
 
+/**
+ * The RailRoad class is an extension of Tile, with a unique algorithm to get rent based on ownership of other railroads
+ */
 public class RailroadTile extends Tile {
     /**
      * The owner of this railroad
