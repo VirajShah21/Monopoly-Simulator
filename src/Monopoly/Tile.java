@@ -1,5 +1,10 @@
 package Monopoly;
 
+
+/**
+ * The Tile class is the superclass for all the squares on a Monopoly game board. The class has two fields
+ * inherited by all children: TYPE, and NAME.
+ */
 public abstract class Tile {
     /**
      * Enumeration used to express the type of tile the current *Tile object refers to
