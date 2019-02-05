@@ -15,24 +15,41 @@ public abstract class Tile {
     TileType TYPE;
 
     /**
-     * The actual name of an instance of a Tile; ex: Reading Railroad, Boardwalk, GO, etc.
+     * The actual name of an instance of a Tile; eg: Reading Railroad, Boardwalk, GO, etc.
      */
     String NAME;
 
+    /**
+     * Constructs the prototype for all Tile subclasses
+     *
+     * @param tileType The type of tile which is being constructed, eg: Property Tile
+     * @param tileName The name of the tile or property/utility/railroad name
+     */
     Tile(TileType tileType, String tileName) {
         TYPE = tileType;
         NAME = tileName;
     }
 
+    /**
+     * @return The type of instance of a Tile subclass
+     */
     TileType getType() {
         return TYPE;
     }
 
+    /**
+     * @return The name of a Tile subclass
+     */
     @SuppressWarnings("unused")
     public String getName() {
         return NAME;
     }
 
+    /**
+     * Builds a game board
+     *
+     * @return The Monopoly game board which was built
+     */
     static Tile[] buildBoard() {
         Tile[] out = new Tile[40];
 
@@ -102,6 +119,9 @@ public abstract class Tile {
         return out;
     }
 
+    /**
+     * @return The name of a tile
+     */
     public String toString() {
         return NAME;
     }
