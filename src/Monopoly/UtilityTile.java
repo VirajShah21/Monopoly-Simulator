@@ -35,14 +35,14 @@ public class UtilityTile extends Tile {
      * @param diceRoll The total rolled by the dice
      * @return The amount of rent payment due by landing on this utility with a certain dice roll
      */
-    int getRent(int diceRoll) {
+    public int getRent(int diceRoll) {
         return isMonopoly() ? diceRoll * 10 : diceRoll * 4;
     }
 
     /**
      * @return True if a player owns this property; false otherwise
      */
-    boolean isOwned() {
+    public boolean isOwned() {
         return owner != null;
     }
 
@@ -51,7 +51,7 @@ public class UtilityTile extends Tile {
      *
      * @param player The player who is purchasing the property
      */
-    void buy(Player player) {
+    public void buy(Player player) {
         owner = player;
         player.deductBalance(getPropertyValue());
         player.addAsset(this);
@@ -71,14 +71,14 @@ public class UtilityTile extends Tile {
     /**
      * @return The price of the Utility
      */
-    int getPropertyValue() {
+    public int getPropertyValue() {
         return 150;
     }
 
     /**
      * @return The owner of the Utility
      */
-    Player getOwner() {
+    public Player getOwner() {
         return owner;
     }
 }

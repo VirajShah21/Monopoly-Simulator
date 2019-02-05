@@ -83,7 +83,7 @@ public class MonopolyGame {
      */
     public void payRent(Player payer, PropertyTile titleDeed) {
         Logger.log(String.format("%s payed $%d %s for rent on %s",
-                payer, titleDeed.getOwner(), titleDeed.getRent(), titleDeed));
+                payer, titleDeed.getRent(), titleDeed.getOwner(), titleDeed));
         payer.deductBalance(titleDeed.getRent());
         titleDeed.getOwner().addBalance(titleDeed.getRent());
     }

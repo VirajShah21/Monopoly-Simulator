@@ -1,8 +1,7 @@
 import Monopoly.*;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.IOException;
+import java.io.*;
+import java.util.*;
 
 class Simulator {
     private static final BufferedReader input =
@@ -25,10 +24,12 @@ class Simulator {
             System.out.println("|  Results of Round  |");
             System.out.println("======================");
             System.out.println();
-            
+
             for (Player person : game.getPlayers()) {
                 System.out.println(person);
             }
         }
+
+
     }
 }

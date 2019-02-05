@@ -9,15 +9,15 @@ public class RailroadTile extends Tile {
      */
     private Player owner;
 
-    RailroadTile(String name) {
+    public RailroadTile(String name) {
         super(TileType.RAILROAD, name);
     }
 
-    int getRent(int railsOwned) {
+    public int getRent(int railsOwned) {
         return railsOwned == 1 ? 25 : 2 * getRent(railsOwned - 1);
     }
 
-    int getRent() {
+    public int getRent() {
         int railsOwned = 0;
 
         for (Tile asset : owner.getAssets())
@@ -27,7 +27,7 @@ public class RailroadTile extends Tile {
         return getRent(railsOwned);
     }
 
-    void buy(Player player) {
+    public void buy(Player player) {
         owner = player;
         player.deductBalance(getPropertyValue());
         player.addAsset(this);
@@ -52,15 +52,15 @@ public class RailroadTile extends Tile {
         return railroadsInSet() == 4;
     }
 
-    int getPropertyValue() {
+    public int getPropertyValue() {
         return 200;
     }
 
-    Player getOwner() {
+    public Player getOwner() {
         return owner;
     }
 
-    boolean isOwned() {
+    public boolean isOwned() {
         return owner != null;
     }
 }

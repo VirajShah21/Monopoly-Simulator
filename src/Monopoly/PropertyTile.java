@@ -62,7 +62,7 @@ public class PropertyTile extends Tile {
      *
      * @param player The Player object which is purchasing the property
      */
-    void buy(Player player) {
+    public void buy(Player player) {
         if (!isOwned()) {
             owner = player;
             player.deductBalance(getPropertyValue());
@@ -84,7 +84,7 @@ public class PropertyTile extends Tile {
     /**
      * @return The number of houses belonging to this property
      */
-    int getHouses() {
+    public int getHouses() {
         if (houses > 4) {
             return 0;
         } else {
@@ -95,28 +95,28 @@ public class PropertyTile extends Tile {
     /**
      * @return True if a hotel belongs to the property; false otherwise
      */
-    boolean hasHotel() {
+    public boolean hasHotel() {
         return houses == 5;
     }
 
     /**
      * @return The price of a property
      */
-    int getPropertyValue() {
+    public int getPropertyValue() {
         return propertyValue;
     }
 
     /**
      * @return The Player object of the Player who owns this property
      */
-    Player getOwner() {
+    public Player getOwner() {
         return owner;
     }
 
     /**
      * @return The color group (as an integer) to which this property belongs to
      */
-    int getGroupNumber() {
+    public int getGroupNumber() {
         return group;
     }
 
@@ -124,7 +124,7 @@ public class PropertyTile extends Tile {
      * @return Get the rent amount which is due when someone lands on the property;
      * this depends on the number of houses/hotels, and whether the property is a monopoly
      */
-    int getRent() {
+    public int getRent() {
         if (isMonopoly()) {
             if (houses == 0)
                 return rents[0] * 2;
