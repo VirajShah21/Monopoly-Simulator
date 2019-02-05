@@ -4,8 +4,19 @@ package Monopoly;
  * The MonopolyGame class is responsible for handling all functions of an instance of a Monopoly game.
  */
 public class MonopolyGame {
+    /**
+     * An array of tiles representing the 40 tiles on a monopoly game board
+     */
     private Tile[] board;
+
+    /**
+     * An array containing all the players in the current game
+     */
     private Player[] players;
+
+    /**
+     * A pointer to an element in MonopolyGame.players; a symbol for who's turn it is next
+     */
     private int currentPlayer;
 
     /**

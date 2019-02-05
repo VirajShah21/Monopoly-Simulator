@@ -5,10 +5,33 @@ package Monopoly;
  * properties on a Monopoly game board.
  */
 public class PropertyTile extends Tile {
+    /**
+     * The rent depending on number of houses.
+     * rent[0] = Rent with 0 houses,
+     * rent[1] = Rent with 1 house ...
+     * rent[4] = Rent with 4 houses
+     * rent[5] = Rent with 1 hotel
+     */
     private int[] rents;
+
+    /**
+     * The price of the property
+     */
     private int propertyValue;
+
+    /**
+     * The Player object which represents who owns the property
+     */
     private Player owner;
+
+    /**
+     * The number of houses on this property (*5 = 1 hotel)
+     */
     private int houses;
+
+    /**
+     * The color group (as a number) to which this property belongs to
+     */
     private int group;
 
     /**

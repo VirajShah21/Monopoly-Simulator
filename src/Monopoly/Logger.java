@@ -7,6 +7,9 @@ import java.util.ArrayList;
  * post-runtime.
  */
 public class Logger {
+    /**
+     * An ArrayList of all the logs created during the runtime
+     */
     private static final ArrayList<String> logs = new ArrayList<>();
 
     /**

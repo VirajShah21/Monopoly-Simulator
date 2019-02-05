@@ -1,6 +1,9 @@
 package Monopoly;
 
 public class RailroadTile extends Tile {
+    /**
+     * The owner of this railroad
+     */
     private Player owner;
 
     RailroadTile(String name) {

@@ -7,7 +7,15 @@ import java.util.ArrayList;
  * for operations on to be done on a Player object.
  */
 public class Card {
-    private String message, call;
+    /**
+     * The message read on the card
+     */
+    private String message;
+
+    /**
+     * The calls to action for when a user picks up the card
+     */
+    private String call;
 
     /**
      * Initialize a new Card object

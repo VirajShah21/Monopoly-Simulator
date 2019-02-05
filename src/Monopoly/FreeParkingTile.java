@@ -5,6 +5,9 @@ package Monopoly;
  * clearing out the free parking pool, and retrieving the pool amount.
  */
 class FreeParkingTile extends Tile {
+    /**
+     * The amount of money in the Free Parking pool of money
+     */
     private int pool;
 
     /**

@@ -12,11 +12,50 @@ import java.util.ArrayList;
 
 @SuppressWarnings("unused")
 public class Player {
+    /**
+     * The name of this player
+     */
     private String name;
-    private int position, balance, getOutOfJailCards, turnsInJail;
+
+    /**
+     * A pointer to MonopolyGame.board which is symbolic for the players position on the game board
+     */
+    private int position;
+
+    /**
+     * The amount of money which belongs to this player
+     */
+    private int balance;
+
+    /**
+     * The number of get out of jail free cards which belong to this player
+     */
+    private int getOutOfJailCards;
+
+    /**
+     * The number of turns a player has spent in jail
+     */
+    private int turnsInJail;
+
+    /**
+     * An ArrayList of all the assets (Tiles) owned by a player
+     */
     private ArrayList<Tile> assets;
+
+    /**
+     * The game which the player belongs to
+     */
     private MonopolyGame game;
-    private boolean inJail, isBankrupt;
+
+    /**
+     * True if the player is in jail; false otherwise
+     */
+    private boolean inJail;
+
+    /**
+     * False if the player is able to pull out of debt; true otherwise
+     */
+    private boolean isBankrupt;
 
     /**
      * Create a new Player and attach it to a monopoly game.

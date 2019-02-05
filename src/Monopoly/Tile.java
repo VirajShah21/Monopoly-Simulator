@@ -1,12 +1,22 @@
 package Monopoly;
 
 public abstract class Tile {
+    /**
+     * Enumeration used to express the type of tile the current *Tile object refers to
+     */
     enum TileType {
         PROPERTY, UTILITY, RAILROAD, CHANCE, COMMUNITY_CHEST, TAX, FREE_PARKING,
         GO_TO_JAIL, JAIL, GO
     }
 
+    /**
+     * The TileType of an instance of a Tile
+     */
     TileType TYPE;
+
+    /**
+     * The actual name of an instance of a Tile; ex: Reading Railroad, Boardwalk, GO, etc.
+     */
     String NAME;
 
     Tile(TileType tileType, String tileName) {
