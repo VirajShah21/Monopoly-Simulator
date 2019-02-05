@@ -255,6 +255,17 @@ public class Player {
             TradeBroker.createOffer(this, p);
         }
 
+        TradeBroker.sortAssetsByWorth(this);
+        for (Tile asset : assets) {
+            if (asset.TYPE == Tile.TileType.PROPERTY) {
+                PropertyTile property = (PropertyTile) asset;
+
+                while (property.getHousePrice() < 0.25 * balance && !property.hasHotel() && property.allowedToBuild()) {
+                    property.buyHouse();
+                }
+            }
+        }
+
         if (roll[0] == roll[1]) {
             Logger.log(String.format("%s rolled doubles (%d). %s will roll again.", this, roll[0], this));
             playTurn();

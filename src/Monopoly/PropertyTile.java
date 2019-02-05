@@ -159,6 +159,47 @@ public class PropertyTile extends Tile {
         owner.addAsset(this);
     }
 
+    public int getHousePrice() {
+        if (group == 1 || group == 2)
+            return 50;
+        else if (group == 3 || group == 4)
+            return 100;
+        else if (group == 5 || group == 6)
+            return 150;
+        else
+            return 200;
+    }
+
+    public void buyHouse() {
+        if (allowedToBuild()) {
+            owner.deductBalance(getHousePrice());
+            this.houses++;
+
+            if (houses < 5) {
+                Logger.log(String.format("%s bought a house on %s for $%d", owner, this, getHousePrice()), true);
+            } else {
+                Logger.log(String.format("%s bought a hotel on %s for $%d", owner, this, getHousePrice()), true);
+            }
+        }
+    }
+
+    public boolean allowedToBuild() {
+        if (isMonopoly()) {
+            PropertyTile lowestInSet = this;
+
+            for (Tile asset : owner.getAssets()) {
+                if (asset.TYPE == TileType.PROPERTY && ((PropertyTile)asset).getGroupNumber() == group) {
+                    PropertyTile property = (PropertyTile) asset;
+
+                    if (property.getHouses() < lowestInSet.getHouses())
+                        return false;
+
+                }
+            }
+            return true;
+        }
+        return false;
+    }
     /**
      * @return The name of the property with the number of houses or hotels;
      * if no buildings are on the property then just the property name will show up

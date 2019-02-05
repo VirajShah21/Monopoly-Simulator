@@ -29,6 +29,12 @@ public class Logger {
             System.out.println(message);
     }
 
+    static void log(String message, boolean forcePrinting) {
+        logs.add(message);
+
+        if (forcePrinting) System.out.println(message);
+    }
+
     /**
      * @return An ArrayList with all the logs created during the runtime
      */
