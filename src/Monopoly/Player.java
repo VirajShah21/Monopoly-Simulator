@@ -403,6 +403,11 @@ public class Player {
         return balance < 0;
     }
 
+    /**
+     * Gets a players personal evaluation of all their assets and cash
+     *
+     * @return The evaluation of a Player's assets and cash
+     */
     public int getPersonalEvaluation() {
         int eval = 0;
         for (Tile t : assets)

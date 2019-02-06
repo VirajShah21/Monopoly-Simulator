@@ -63,6 +63,13 @@ public class TradeBroker {
         return eval - 100;
     }
 
+    /**
+     * Get the personal evaluation of a property when belonging to another player
+     *
+     * @param tile   The tile (ownable tile) which is in question
+     * @param player The player who the evaluation is for
+     * @return The worth of an asset to player who does not own it yet
+     */
     public static int getAssetWorthToOther(@NotNull Tile tile, Player player) {
         int eval = 0;
 
@@ -110,6 +117,12 @@ public class TradeBroker {
 
     }
 
+    /**
+     * Creates a "smart offer" for the sender, and allows negotiations to compromise on a deal
+     *
+     * @param sender   The Player creating the offer
+     * @param reciever The player receiving the offer
+     */
     public static void createOffer(Player sender, Player reciever) {
         sortAssetsByWorth(sender);
 

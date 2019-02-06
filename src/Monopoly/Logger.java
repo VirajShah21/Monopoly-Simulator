@@ -29,10 +29,16 @@ public class Logger {
             System.out.println(message);
     }
 
-    static void log(String message, boolean forcePrinting) {
+    /**
+     * Creates a new log and allows forced printing/print-suppression
+     *
+     * @param message        The message to be added to the set of logs
+     * @param allowedToPrint Whether this method call should print out the message upon creation
+     */
+    static void log(String message, boolean allowedToPrint) {
         logs.add(message);
 
-        if (forcePrinting) System.out.println(message);
+        if (allowedToPrint) System.out.println(message);
     }
 
     /**

@@ -82,6 +82,11 @@ public class UtilityTile extends Tile {
         return owner;
     }
 
+    /**
+     * Transfers ownership from an old owner to a new owner
+     *
+     * @param newOwner The new owner of the Utility
+     */
     public void transferOwnership(Player newOwner) {
         owner.removeAsset(owner.getAssets().indexOf(this));
         owner = newOwner;

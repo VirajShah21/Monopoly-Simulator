@@ -153,6 +153,11 @@ public class PropertyTile extends Tile {
             return setCount == 3;
     }
 
+    /**
+     * Transfers owner ship of a property tile to another Player object
+     *
+     * @param newOwner The owner who the property should be sent to
+     */
     public void transferOwnership(Player newOwner) {
         int oldIndex = owner.getAssets().indexOf(this);
         owner.removeAsset(oldIndex);
@@ -160,6 +165,11 @@ public class PropertyTile extends Tile {
         owner.addAsset(this);
     }
 
+    /**
+     * Get the price to purchase a house/hotel on a property
+     *
+     * @return Price of a house/hotel
+     */
     public int getHousePrice() {
         if (group == 1 || group == 2)
             return 50;
@@ -171,6 +181,9 @@ public class PropertyTile extends Tile {
             return 200;
     }
 
+    /**
+     * Purchases a house; automatically deducts balance from purchasing player and increments hosue counter
+     */
     public void buyHouse() {
         if (allowedToBuild()) {
             owner.deductBalance(getHousePrice());
@@ -184,12 +197,15 @@ public class PropertyTile extends Tile {
         }
     }
 
+    /**
+     * @return True if a player is allowed to build upon this property; false otherwise.
+     */
     public boolean allowedToBuild() {
         if (isMonopoly()) {
             PropertyTile lowestInSet = this;
 
             for (Tile asset : owner.getAssets()) {
-                if (asset.TYPE == TileType.PROPERTY && ((PropertyTile)asset).getGroupNumber() == group) {
+                if (asset.TYPE == TileType.PROPERTY && ((PropertyTile) asset).getGroupNumber() == group) {
                     PropertyTile property = (PropertyTile) asset;
 
                     if (property.getHouses() < lowestInSet.getHouses())
@@ -201,6 +217,7 @@ public class PropertyTile extends Tile {
         }
         return false;
     }
+
     /**
      * @return The name of the property with the number of houses or hotels;
      * if no buildings are on the property then just the property name will show up
