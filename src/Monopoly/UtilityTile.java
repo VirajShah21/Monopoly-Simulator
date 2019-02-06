@@ -3,11 +3,8 @@ package Monopoly;
 /**
  * The UtilityTile class is a subclass of Tile which has specific algorithms for getting rent amounts.
  */
-public class UtilityTile extends Tile {
-    /**
-     * The owner of an instance of a UtilityTile
-     */
-    private Player owner;
+public class UtilityTile extends OwnableTile {
+    private int lastDiceRoll;
 
     /**
      * Construct a new UtilityTile
@@ -32,40 +29,19 @@ public class UtilityTile extends Tile {
     }
 
     /**
-     * @param diceRoll The total rolled by the dice
-     * @return The amount of rent payment due by landing on this utility with a certain dice roll
+     * @return The amount of rent payment due by landing on this utility
      */
-    public int getRent(int diceRoll) {
-        return isMonopoly() ? diceRoll * 10 : diceRoll * 4;
+    public int getRent() {
+        return isMonopoly() ? lastDiceRoll * 10 : lastDiceRoll * 4;
     }
 
     /**
-     * @return True if a player owns this property; false otherwise
-     */
-    public boolean isOwned() {
-        return owner != null;
-    }
-
-    /**
-     * Allows a player to purchase the current utility tile
+     * Assign the value of the last dice roll
      *
-     * @param player The player who is purchasing the property
+     * @param n The sum of two dice rolls
      */
-    public void buy(Player player) {
-        owner = player;
-        player.deductBalance(getPropertyValue());
-        player.addAsset(this);
-    }
-
-    /**
-     * Foreclose a property by reimbursing the owner and removing the title deed.
-     */
-    @SuppressWarnings("unused")
-    public void foreclose() {
-        owner.addBalance(150);
-        owner.removeAsset(owner.getAssets().indexOf(this));
-        owner = null;
-
+    public void setLastDiceRoll(int n) {
+        lastDiceRoll = n;
     }
 
     /**
@@ -73,23 +49,5 @@ public class UtilityTile extends Tile {
      */
     public int getPropertyValue() {
         return 150;
-    }
-
-    /**
-     * @return The owner of the Utility
-     */
-    public Player getOwner() {
-        return owner;
-    }
-
-    /**
-     * Transfers ownership from an old owner to a new owner
-     *
-     * @param newOwner The new owner of the Utility
-     */
-    public void transferOwnership(Player newOwner) {
-        owner.removeAsset(owner.getAssets().indexOf(this));
-        owner = newOwner;
-        owner.addAsset(this);
     }
 }

@@ -88,6 +88,7 @@ public class MonopolyGame {
     public void payRent(Player payer, PropertyTile titleDeed) {
         Logger.log(String.format("%s payed $%d %s for rent on %s",
                 payer, titleDeed.getRent(), titleDeed.getOwner(), titleDeed));
+
         payer.deductBalance(titleDeed.getRent());
         titleDeed.getOwner().addBalance(titleDeed.getRent());
     }
@@ -100,10 +101,11 @@ public class MonopolyGame {
      * @param roll      The amount rolled in order to have landed on such property
      */
     public void payRent(Player payer, UtilityTile titleDeed, int roll) {
+        titleDeed.setLastDiceRoll(roll);
         Logger.log(String.format("%s payed $%d %s for rent on %s",
-                payer, titleDeed.getRent(roll), titleDeed.getOwner(), titleDeed));
-        payer.deductBalance(titleDeed.getRent(roll));
-        titleDeed.getOwner().addBalance(titleDeed.getRent(roll));
+                payer, titleDeed.getRent(), titleDeed.getOwner(), titleDeed));
+        payer.deductBalance(titleDeed.getRent());
+        titleDeed.getOwner().addBalance(titleDeed.getRent());
     }
 
     /**

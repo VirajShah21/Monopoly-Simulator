@@ -4,7 +4,12 @@ package Monopoly;
  * The PropertyTile is an subclass of Tile. It contains fields associated more specifically with those of colored
  * properties on a Monopoly game board.
  */
-public class PropertyTile extends Tile {
+public class PropertyTile extends OwnableTile {
+    /**
+     * The price of the property
+     */
+    private int propertyValue;
+
     /**
      * The rent depending on number of houses.
      * rent[0] = Rent with 0 houses,
@@ -13,16 +18,6 @@ public class PropertyTile extends Tile {
      * rent[5] = Rent with 1 hotel
      */
     private int[] rents;
-
-    /**
-     * The price of the property
-     */
-    private int propertyValue;
-
-    /**
-     * The Player object which represents who owns the property
-     */
-    private Player owner;
 
     /**
      * The number of houses on this property (*5 = 1 hotel)
@@ -51,37 +46,6 @@ public class PropertyTile extends Tile {
     }
 
     /**
-     * @return True if the property is owned; false otherwise
-     */
-    boolean isOwned() {
-        return owner != null;
-    }
-
-    /**
-     * Allows a player to purchase a property
-     *
-     * @param player The Player object which is purchasing the property
-     */
-    public void buy(Player player) {
-        if (!isOwned()) {
-            owner = player;
-            player.deductBalance(getPropertyValue());
-            player.addAsset(this);
-        }
-    }
-
-    /**
-     * Forecloses a property. Gives the player their money bank, strips Player object of ownership,
-     * and gives the property back to the bank.
-     */
-    @SuppressWarnings("unused")
-    public void foreclose() {
-        owner.addBalance(propertyValue);
-        owner.removeAsset(owner.getAssets().indexOf(this));
-        owner = null;
-    }
-
-    /**
      * @return The number of houses belonging to this property
      */
     public int getHouses() {
@@ -104,13 +68,6 @@ public class PropertyTile extends Tile {
      */
     public int getPropertyValue() {
         return propertyValue;
-    }
-
-    /**
-     * @return The Player object of the Player who owns this property
-     */
-    public Player getOwner() {
-        return owner;
     }
 
     /**
@@ -151,18 +108,6 @@ public class PropertyTile extends Tile {
             return setCount == 2;
         else
             return setCount == 3;
-    }
-
-    /**
-     * Transfers owner ship of a property tile to another Player object
-     *
-     * @param newOwner The owner who the property should be sent to
-     */
-    public void transferOwnership(Player newOwner) {
-        int oldIndex = owner.getAssets().indexOf(this);
-        owner.removeAsset(oldIndex);
-        owner = newOwner;
-        owner.addAsset(this);
     }
 
     /**

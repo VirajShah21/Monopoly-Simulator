@@ -3,12 +3,7 @@ package Monopoly;
 /**
  * The RailRoad class is an extension of Tile, with a unique algorithm to get rent based on ownership of other railroads
  */
-public class RailroadTile extends Tile {
-    /**
-     * The owner of this railroad
-     */
-    private Player owner;
-
+public class RailroadTile extends OwnableTile {
     /**
      * Constructs a RailroadTile object
      *
@@ -24,7 +19,7 @@ public class RailroadTile extends Tile {
      * @param railsOwned The number of a railroads owned
      * @return The amount of rent due on a Railroad
      */
-    public int getRent(int railsOwned) {
+    private int getRent(int railsOwned) {
         return railsOwned <= 1 ? 25 * Math.max(0, railsOwned) : 2 * getRent(railsOwned - 1);
     }
 
@@ -41,26 +36,6 @@ public class RailroadTile extends Tile {
                 railsOwned++;
 
         return getRent(railsOwned);
-    }
-
-    /**
-     * Purchase a railroad from the bank
-     *
-     * @param player The player whom is purchasing the railroad
-     */
-    public void buy(Player player) {
-        owner = player;
-        player.deductBalance(getPropertyValue());
-        player.addAsset(this);
-    }
-
-    /**
-     * Strip owner of ownership from the railroad and give them the property value back
-     */
-    public void foreclose() {
-        owner.addBalance(200);
-        owner.removeAsset(owner.getAssets().indexOf(this));
-        owner = null;
     }
 
     /**
@@ -93,34 +68,5 @@ public class RailroadTile extends Tile {
      */
     public int getPropertyValue() {
         return 200;
-    }
-
-    /**
-     * Returns the owner who owns this railroad
-     *
-     * @return The owner who owns this railroad
-     */
-    public Player getOwner() {
-        return owner;
-    }
-
-    /**
-     * Transfers ownership of the railroad to another player
-     *
-     * @param newOwner The player receiving ownership of the railroad
-     */
-    public void transferOwnership(Player newOwner) {
-        owner.removeAsset(owner.getAssets().indexOf(this));
-        owner = newOwner;
-        owner.addAsset(this);
-    }
-
-    /**
-     * Checks to see if the railroad is owned by anyone
-     *
-     * @return True if railroad has an owner; false otherwise
-     */
-    public boolean isOwned() {
-        return owner != null;
     }
 }
