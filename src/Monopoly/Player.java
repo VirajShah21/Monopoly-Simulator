@@ -53,11 +53,6 @@ public class Player {
     private boolean inJail;
 
     /**
-     * False if the player is able to pull out of debt; true otherwise
-     */
-    private boolean isBankrupt;
-
-    /**
      * Create a new Player and attach it to a monopoly game.
      *
      * @param name     The name of the new player
@@ -72,7 +67,6 @@ public class Player {
         getOutOfJailCards = 0;
         inJail = false;
         turnsInJail = 0;
-        isBankrupt = false;
     }
 
     /**
@@ -150,7 +144,7 @@ public class Player {
      * @return The ArrayList of assets belonging to this player.
      */
     public ArrayList<Tile> getAssets() {
-        return assets;
+        return assets != null ? assets : new ArrayList<Tile>();
     }
 
     /**
@@ -159,7 +153,7 @@ public class Player {
      * @param asset A Tile which acts as a title deed.
      */
     public void addAsset(Tile asset) {
-        assets.add(asset);
+        if (assets != null) assets.add(asset);
     }
 
     /**
@@ -168,13 +162,17 @@ public class Player {
      * @param index Index in the asset list to remove an asset from.
      */
     public void removeAsset(int index) {
-        assets.remove(index);
+        if (assets != null && index >= 0)
+            assets.remove(index);
     }
 
     /**
      * Play the player's turn; this method takes everything into account when playing a turn.
      */
     public void playTurn() {
+        if (isBankrupt())
+            return;
+
         int[] roll = Dice.roll2();
         int moveAmount = roll[0] + roll[1];
 
@@ -251,11 +249,14 @@ public class Player {
             }
         }
 
-        for (Player p : game.getPlayers()) {
-            TradeBroker.createOffer(this, p);
-        }
+        if (!isBankrupt())
+            for (Player p : game.getPlayers())
+                if (!p.isBankrupt())
+                    TradeBroker.createOffer(this, p);
+
 
         TradeBroker.sortAssetsByWorth(this);
+
         for (Tile asset : assets) {
             if (asset.TYPE == Tile.TileType.PROPERTY) {
                 PropertyTile property = (PropertyTile) asset;
@@ -266,11 +267,13 @@ public class Player {
             }
         }
 
+
         if (roll[0] == roll[1]) {
             Logger.log(String.format("%s rolled doubles (%d). %s will roll again.", this, roll[0], this));
             playTurn();
         }
     }
+
 
     /**
      * Find the least desired asset in an asset list. Used when selling properties.
@@ -324,7 +327,7 @@ public class Player {
     }
 
     /**
-     * Dedcut balance from user. If tthey do not have enough money, they will sell get out of jail free cards and properties.
+     * Dedcut balance from user. If they do not have enough money, they will sell get out of jail free cards and properties.
      *
      * @param amount The amount to be deducted from the player's balance
      */
@@ -341,17 +344,31 @@ public class Player {
             try {
                 Tile getRid = assets.get(0);
                 if (getRid.TYPE == Tile.TileType.PROPERTY) {
-                    PropertyTile p = (PropertyTile) getRid;
-                    p.foreclose();
+                    ((PropertyTile) getRid).foreclose();
                 } else if (getRid.TYPE == Tile.TileType.UTILITY) {
-                    UtilityTile u = (UtilityTile) getRid;
-                    u.foreclose();
+                    ((UtilityTile) getRid).foreclose();
                 } else if (getRid.TYPE == Tile.TileType.RAILROAD) {
-                    RailroadTile r = (RailroadTile) getRid;
-                    r.foreclose();
+                    ((RailroadTile) getRid).foreclose();
                 }
             } catch (NullPointerException e) {
-                isBankrupt = true;
+                break;
+            } catch (IndexOutOfBoundsException e) {
+                break;
+            }
+        }
+
+        if (balance < 0) {
+            while (assets.size() > 0) {
+                Tile getRid = assets.get(0);
+                if (getRid.TYPE == Tile.TileType.PROPERTY) {
+                    ((PropertyTile) getRid).foreclose();
+                } else if (getRid.TYPE == Tile.TileType.UTILITY) {
+                    ((UtilityTile) getRid).foreclose();
+                } else if (getRid.TYPE == Tile.TileType.RAILROAD) {
+                    ((RailroadTile) getRid).foreclose();
+                } else {
+                    assets.remove(0);
+                }
             }
         }
     }
@@ -380,10 +397,10 @@ public class Player {
     /**
      * Checks if the player is bankrupt.
      *
-     * @return true if the player is bankrupt; false otherwise.
+     * @return False if the player is able to pull out of debt; true otherwise
      */
     public boolean isBankrupt() {
-        return isBankrupt;
+        return balance < 0;
     }
 
     public int getPersonalEvaluation() {

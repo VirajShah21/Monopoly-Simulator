@@ -107,6 +107,7 @@ public class TradeBroker {
                 }
             }
         }
+
     }
 
     public static void createOffer(Player sender, Player reciever) {

@@ -47,7 +47,7 @@ public class TradeOffer {
     }
 
     public void negotiate() {
-        if (getSenderGain() > 0 && getReceiverGain() > 0 && senderStake > sender.getBalance() * 0.45) {
+        if (getSenderGain() > 0 && getReceiverGain() > 0 && senderStake < sender.getBalance() * 0.45) {
             isFairTrade = true;
         } else {
             isFairTrade = false;

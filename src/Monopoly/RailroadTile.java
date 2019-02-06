@@ -14,7 +14,7 @@ public class RailroadTile extends Tile {
     }
 
     public int getRent(int railsOwned) {
-        return railsOwned == 1 ? 25 : 2 * getRent(railsOwned - 1);
+        return railsOwned <= 1 ? 25 * Math.max(0, railsOwned) : 2 * getRent(railsOwned - 1);
     }
 
     public int getRent() {

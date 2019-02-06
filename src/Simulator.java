@@ -9,6 +9,8 @@ class Simulator {
 
     public static void main(String[] args) throws IOException {
 //        Logger.printLogsWhenCreated = true;
+
+
         MonopolyGame game = new MonopolyGame();
         while (true) {
             System.out.print("How many turns would you like to play: ");
@@ -33,3 +35,4 @@ class Simulator {
         }
     }
 }
+

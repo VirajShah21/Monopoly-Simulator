@@ -49,6 +49,10 @@ public class MonopolyGame {
             System.out.println("Every player is now bankrupt.");
             System.exit(0);
         }
+
+        if (players[currentPlayer].getBalance() < 0) {
+            new Exception().printStackTrace();
+        }
     }
 
     /**
@@ -96,6 +100,8 @@ public class MonopolyGame {
      * @param roll      The amount rolled in order to have landed on such property
      */
     public void payRent(Player payer, UtilityTile titleDeed, int roll) {
+        Logger.log(String.format("%s payed $%d %s for rent on %s",
+                payer, titleDeed.getRent(roll), titleDeed.getOwner(), titleDeed));
         payer.deductBalance(titleDeed.getRent(roll));
         titleDeed.getOwner().addBalance(titleDeed.getRent(roll));
     }
@@ -107,6 +113,8 @@ public class MonopolyGame {
      * @param titleDeed The Railroad on which rent is due
      */
     public void payRent(Player payer, RailroadTile titleDeed) {
+        Logger.log(String.format("%s payed $%d %s for rent on %s",
+                payer, titleDeed.getRent(), titleDeed.getOwner(), titleDeed));
         payer.deductBalance(titleDeed.getRent());
         titleDeed.getOwner().addBalance(titleDeed.getRent());
     }

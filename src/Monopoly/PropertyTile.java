@@ -154,7 +154,8 @@ public class PropertyTile extends Tile {
     }
 
     public void transferOwnership(Player newOwner) {
-        owner.removeAsset(owner.getAssets().indexOf(this));
+        int oldIndex = owner.getAssets().indexOf(this);
+        owner.removeAsset(oldIndex);
         owner = newOwner;
         owner.addAsset(this);
     }
