@@ -10,7 +10,7 @@ public class RailroadTile extends OwnableTile {
      * @param name The name of the railroad
      */
     public RailroadTile(String name) {
-        super(TileType.RAILROAD, name);
+        super(TileType.RAILROAD, name, 200);
     }
 
     /**

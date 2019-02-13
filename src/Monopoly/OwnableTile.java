@@ -8,14 +8,21 @@ public abstract class OwnableTile extends Tile {
      */
     protected Player owner;
 
+    protected boolean mortgaged;
+
+    protected int propertyValue;
+
     /**
      * Constructs the Tile super.super class, and the Ownable Tile super class
      *
-     * @param tileType The type of tile being created
-     * @param tileName The name of the tile being created
+     * @param tileType      The type of tile being created
+     * @param tileName      The name of the tile being created
+     * @param propertyValue The price of the property
      */
-    public OwnableTile(TileType tileType, String tileName) {
+    public OwnableTile(TileType tileType, String tileName, int propertyValue) {
         super(tileType, tileName);
+        this.propertyValue = propertyValue;
+        mortgaged = false;
     }
 
     /**
@@ -43,6 +50,7 @@ public abstract class OwnableTile extends Tile {
         owner = null;
     }
 
+
     /**
      * Allows a player to purchase the current utility tile
      *
@@ -66,6 +74,21 @@ public abstract class OwnableTile extends Tile {
         owner.removeAsset(oldIndex);
         owner = newOwner;
         owner.addAsset(this);
+    }
+
+    public boolean isMortgaged() {
+        return mortgaged;
+    }
+
+    public boolean isMortgagable() {
+        return !mortgaged;
+    }
+
+    public void mortgage() {
+        if (isMortgagable()) {
+            mortgaged = true;
+            owner.addBalance(propertyValue / 2);
+        }
     }
 
     /**

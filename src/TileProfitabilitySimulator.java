@@ -1,24 +1,15 @@
 import Monopoly.LoggerTools.LandingLog;
 import Monopoly.LoggerTools.Logger;
 import Monopoly.MonopolyGame;
-import Monopoly.Player;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 /**
  * The Simulator to test a tiles profitability
  */
 class TileProfitabilitySimulator {
-    /**
-     * The InputStreamReader which will recieve input from the person running the simulator
-     */
-    private static final BufferedReader input =
-            new BufferedReader(new InputStreamReader(System.in));
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         Logger.printLogsWhenCreated = false;
 
 
@@ -27,11 +18,6 @@ class TileProfitabilitySimulator {
             while (game.getPlayers().size() > 1) {
                 game.nextPlayer();
                 game.playTurn();
-
-
-                for (Player p : game.getPlayers())
-                    System.out.println(p.toString() + ": " + p.getAssets().toString());
-                System.out.println("\n\n");
             }
 
             game = new MonopolyGame();
@@ -49,9 +35,9 @@ class TileProfitabilitySimulator {
             tileProfits[log.getTile()] += log.getRentDue();
         }
 
-//        for (int i = 0; i < tileFrequency.length /* 40 */; i++) {
-//            System.out.printf("%s\t%d\t%d\n", game.tileAt(i).getName(), tileFrequency[i], tileProfits[i]);
-//        }
+        for (int i = 0; i < tileFrequency.length /* 40 */; i++) {
+            System.out.printf("%s\t%d\t%d\n", game.tileAt(i).getName(), tileFrequency[i], tileProfits[i]);
+        }
     }
 }
 

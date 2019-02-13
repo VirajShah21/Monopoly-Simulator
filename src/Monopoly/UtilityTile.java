@@ -12,7 +12,7 @@ public class UtilityTile extends OwnableTile {
      * @param name The name of the Utility
      */
     UtilityTile(String name) {
-        super(TileType.UTILITY, name);
+        super(TileType.UTILITY, name, 150);
     }
 
     /**

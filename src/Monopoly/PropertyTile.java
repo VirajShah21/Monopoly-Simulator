@@ -8,11 +8,6 @@ import Monopoly.LoggerTools.Logger;
  */
 public class PropertyTile extends OwnableTile {
     /**
-     * The price of the property
-     */
-    private int propertyValue;
-
-    /**
      * The rent depending on number of houses.
      * rent[0] = Rent with 0 houses,
      * rent[1] = Rent with 1 house ...
@@ -40,7 +35,7 @@ public class PropertyTile extends OwnableTile {
      * @param group         The color group to which the property belongs to
      */
     PropertyTile(String propertyName, int propertyValue, int[] rentAmounts, int group) {
-        super(TileType.PROPERTY, propertyName);
+        super(TileType.PROPERTY, propertyName, propertyValue);
         this.propertyValue = propertyValue;
         rents = rentAmounts;
         houses = 0;
@@ -163,6 +158,10 @@ public class PropertyTile extends OwnableTile {
             return true;
         }
         return false;
+    }
+
+    public boolean isMortgagable() {
+        return super.isMortgagable() && houses == 0;
     }
 
     /**
