@@ -8,7 +8,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-class Simulator {
+/**
+ * The Simulator to test a tiles profitability
+ */
+class TileProfitabilitySimulator {
+    /**
+     * The InputStreamReader which will recieve input from the person running the simulator
+     */
     private static final BufferedReader input =
             new BufferedReader(new InputStreamReader(System.in));
 
@@ -17,20 +23,20 @@ class Simulator {
 
 
         MonopolyGame game = new MonopolyGame();
-//        for (int i = 0; i < 1000; i++) {
-        while (game.getPlayers().size() > 1) {
-            game.nextPlayer();
-            game.playTurn();
+        for (int i = 0; i < 1000; i++) {
+            while (game.getPlayers().size() > 1) {
+                game.nextPlayer();
+                game.playTurn();
 
 
-            for (Player p : game.getPlayers())
-                System.out.println(p.toString() + ": " + p.getAssets().toString());
-            System.out.println("\n\n");
+                for (Player p : game.getPlayers())
+                    System.out.println(p.toString() + ": " + p.getAssets().toString());
+                System.out.println("\n\n");
+            }
+
+            game = new MonopolyGame();
+            // At bottom so that initialization occurs during declaration to avoid "game may not be initialized" error
         }
-
-        game = new MonopolyGame(); // At bottom so that initialization occurs during declaration to avoid
-        // "game may not be initialized" error
-//        }
 
         int landingLogSize = Logger.getLandingLogStream().size();
         ArrayList<LandingLog> landingLogs = Logger.getLandingLogStream();
