@@ -1,5 +1,7 @@
 package Monopoly;
 
+import Monopoly.LoggerTools.LandingLog;
+import Monopoly.LoggerTools.Logger;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -208,37 +210,35 @@ public class Player {
         Logger.log(String.format("%s moved to %s", this, game.tileAt(position)));
 
         Tile currTile = game.tileAt(position);
-        if (currTile.TYPE == Tile.TileType.PROPERTY) {
-            if (!((PropertyTile) currTile).isOwned()) {
-                ((PropertyTile) currTile).buy(this);
-            } else if (((PropertyTile) currTile).getOwner() != this) {
-                game.payRent(this, (PropertyTile) currTile);
-            }
-        } else if (currTile.TYPE == Tile.TileType.UTILITY) {
-            if (!((UtilityTile) currTile).isOwned()) {
-                ((UtilityTile) currTile).buy(this);
+        if (currTile.TYPE == Tile.TileType.PROPERTY || currTile.TYPE == Tile.TileType.RAILROAD || currTile.TYPE == Tile.TileType.UTILITY) {
+            OwnableTile tile = (OwnableTile)currTile;
+
+            if (!tile.isOwned()) {
+                tile.buy(this);
+                Logger.log(new LandingLog(this.name, position, 0));
+            } else if (((OwnableTile) currTile).getOwner() != this) {
+                game.payRent(this, tile, moveAmount);
+                Logger.log(new LandingLog(name, position, ((OwnableTile) currTile).getRent()));
             } else {
-                game.payRent(this, (UtilityTile) currTile, moveAmount);
-            }
-        } else if (currTile.TYPE == Tile.TileType.RAILROAD) {
-            if (!((RailroadTile) currTile).isOwned()) {
-                ((RailroadTile) currTile).buy(this);
-            } else {
-                game.payRent(this, (RailroadTile) currTile);
+                Logger.log(new LandingLog(name, position, 0));
             }
         } else if (currTile.TYPE == Tile.TileType.CHANCE) {
             Card chanceCard = Card.pickRandomCard(Card.chanceDeck);
             chanceCard.pickup(this);
+            Logger.log(new LandingLog(name, position, 0));
         } else if (currTile.TYPE == Tile.TileType.COMMUNITY_CHEST) {
             Card ccCard = Card.pickRandomCard(Card.communityChestDeck);
             ccCard.pickup(this);
+            Logger.log(new LandingLog(name, position, 0));
         } else if (currTile.TYPE == Tile.TileType.GO_TO_JAIL) {
             setPosition(10);
             goToJail();
+            Logger.log(new LandingLog(name, position, 0));
         } else if (currTile.TYPE == Tile.TileType.FREE_PARKING) {
             int poolSize = ((FreeParkingTile) currTile).getPoolAmount();
             this.addBalance(poolSize);
             ((FreeParkingTile) currTile).clearPool();
+            Logger.log(new LandingLog(name, position, 0));
         } else if (currTile.TYPE == Tile.TileType.TAX) {
             if (position == 4) {
                 deductBalance(200);
@@ -247,6 +247,7 @@ public class Player {
                 deductBalance(100);
                 ((FreeParkingTile) game.tileAt(20)).addToPool(100);
             }
+            Logger.log(new LandingLog(name, position, 0));
         }
 
         if (!isBankrupt())
@@ -369,6 +370,8 @@ public class Player {
                     assets.remove(0);
                 }
             }
+
+            getGame().getPlayers().remove(this);
         }
     }
 

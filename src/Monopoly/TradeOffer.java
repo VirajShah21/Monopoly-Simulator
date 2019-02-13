@@ -1,5 +1,7 @@
 package Monopoly;
 
+import Monopoly.LoggerTools.Logger;
+
 public class TradeOffer {
     /**
      * The Player initializing the offer

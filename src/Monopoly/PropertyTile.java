@@ -1,5 +1,7 @@
 package Monopoly;
 
+import Monopoly.LoggerTools.Logger;
+
 /**
  * The PropertyTile is an subclass of Tile. It contains fields associated more specifically with those of colored
  * properties on a Monopoly game board.
@@ -135,9 +137,9 @@ public class PropertyTile extends OwnableTile {
             this.houses++;
 
             if (houses < 5) {
-                Logger.log(String.format("%s bought a house on %s for $%d", owner, this, getHousePrice()), true);
+                Logger.log(String.format("%s bought a house on %s for $%d", owner, this, getHousePrice()));
             } else {
-                Logger.log(String.format("%s bought a hotel on %s for $%d", owner, this, getHousePrice()), true);
+                Logger.log(String.format("%s bought a hotel on %s for $%d", owner, this, getHousePrice()));
             }
         }
     }

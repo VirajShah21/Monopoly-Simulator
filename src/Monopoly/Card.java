@@ -1,5 +1,7 @@
 package Monopoly;
 
+import Monopoly.LoggerTools.Logger;
+
 import java.util.ArrayList;
 
 /**
@@ -99,14 +101,14 @@ public class Card {
                 player.setPosition(Integer.parseInt(words[1]));
             } else if (words[0].equals("earn")) {
                 if (words[1].equals("from-all")) {
-                    Player[] players = player.getGame().getPlayers();
+                    ArrayList<Player> players = player.getGame().getPlayers();
 
                     int amount = Integer.parseInt(words[2]);
-                    for (Player person : players) {
-                        person.deductBalance(amount);
+                    for (int i = 0; i < players.size(); i++) {
+                        players.get(i).deductBalance(amount);
                     }
 
-                    player.addBalance(amount * players.length);
+                    player.addBalance(amount * players.size());
                 } else {
                     player.addBalance(Integer.parseInt(words[1]));
                 }
@@ -115,8 +117,8 @@ public class Card {
                     // The logic in this block works out perfectly
                     // 1.
                     int amount = Integer.parseInt(words[2]);
-                    Player[] otherPlayers = player.getGame().getPlayers();
-                    player.deductBalance(amount * otherPlayers.length);
+                    ArrayList<Player> otherPlayers = player.getGame().getPlayers();
+                    player.deductBalance(amount * otherPlayers.size());
                     for (Player otherPlayer : otherPlayers) {
                         otherPlayer.addBalance(amount);
                     }
