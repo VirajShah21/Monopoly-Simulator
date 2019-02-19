@@ -80,10 +80,18 @@ public abstract class OwnableTile extends Tile {
         owner.addAsset(this);
     }
 
+    /**
+     * Checks if a property is mortgaged
+     *
+     * @return True if the property is mortgaged, false otherwise
+     */
     public boolean isMortgaged() {
         return mortgaged;
     }
 
+    /**
+     * Mortgages the property
+     */
     public void mortgage() {
         if (!mortgaged) {
             mortgaged = true;
@@ -92,6 +100,9 @@ public abstract class OwnableTile extends Tile {
         }
     }
 
+    /**
+     * Unmortgages a property if the owner has enough funds
+     */
     public void unmortgage() {
         if (mortgaged && owner.getBalance() > 1.1 * (propertyValue / 2)) {
             mortgaged = false;
@@ -121,6 +132,10 @@ public abstract class OwnableTile extends Tile {
      */
     abstract boolean isMonopoly();
 
+    /**
+     *
+     * @return
+     */
     abstract ArrayList<? extends OwnableTile> getMonopolySet();
 
     public String toString() {

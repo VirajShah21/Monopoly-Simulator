@@ -44,21 +44,27 @@ public class PropertyTile extends OwnableTile {
         this.group = group;
     }
 
+    public void setNumberOfHouses(int n) {
+        houses = n;
+    }
+
+    /**
+     * Mortgages a property
+     */
     public void mortgage() {
         if (isMonopoly()) {
             ArrayList<PropertyTile> colorSet = getMonopolySet();
 
             for (int i = 0; i < colorSet.size(); i++) {
-                while (colorSet.get(i).getHouses() > 0) {
-                    colorSet.get(i).sellHouse();
-                }
+                int numHouses = colorSet.get(i).getHouses();
+                owner.addBalance(numHouses * getHousePrice() / 2);
+                colorSet.get(i).setNumberOfHouses(0);
             }
         }
 
         owner.addBalance(propertyValue / 2);
         mortgaged = true;
     }
-
 
     /**
      * @return The number of houses belonging to this property
@@ -176,7 +182,9 @@ public class PropertyTile extends OwnableTile {
         return colorSet;
     }
 
-
+    /**
+     * Sell a house back to the bank
+     */
     public void sellHouse() {
         if (houses > 0) {
             houses--;
@@ -188,14 +196,16 @@ public class PropertyTile extends OwnableTile {
     public void autoSellHouseOnMonopoly() {
         if (isMonopoly()) {
             ArrayList<PropertyTile> colorSet = getMonopolySet();
+            PropertyTile highestProperty = this;
 
-            PropertyTile highestProperty = colorSet.get(0);
-
-            for (int i = 1; i < colorSet.size(); i++)
-                if (colorSet.get(i).getHouses() > highestProperty.getHouses())
+            for (int i = 1; i < colorSet.size(); i++) {
+                if (colorSet.get(i).getHouses() > highestProperty.getHouses()) {
                     highestProperty = colorSet.get(i);
-
+                }
+            }
             highestProperty.sellHouse();
+        } else {
+            Logger.log("Something wen't wrong. Cannot sell a house on a property which is not a monopoly");
         }
     }
 
@@ -203,7 +213,7 @@ public class PropertyTile extends OwnableTile {
      * @return True if a player is allowed to build upon this property; false otherwise.
      */
     public boolean allowedToBuild() {
-        if (isMonopoly()) {
+        if (isMonopoly() && !isMortgaged()) {
             PropertyTile lowestInSet = this;
 
             for (Tile asset : owner.getAssets()) {

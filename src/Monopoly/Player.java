@@ -253,7 +253,7 @@ public class Player {
             Logger.log(new LandingLog(name, position, 0));
         }
 
-        if (!isBankrupt())
+        if (!isBankrupt() && assets.size() > 3 && game.getPlayers().size() > 2)
             for (Player p : game.getPlayers())
                 if (!p.isBankrupt())
                     TradeBroker.createOffer(this, p);
@@ -261,7 +261,7 @@ public class Player {
 
         TradeBroker.sortAssetsByWorth(this);
 
-        for (Tile asset : assets) {
+        for (OwnableTile asset : assets) {
             if (asset.TYPE == Tile.TileType.PROPERTY) {
                 PropertyTile property = (PropertyTile) asset;
 
@@ -366,26 +366,26 @@ public class Player {
             for (int i = 0; i < assets.size(); i++)
                 if (!assets.get(i).isMonopoly() && !assets.get(i).isMortgaged())
                     assets.get(i).mortgage();
-        }
 
-        while (amount > balance && getTotalNumberOfHouses() > 0) {
-            TradeBroker.sortAssetsByWorth(this);
+            while (amount > balance && getTotalNumberOfHouses() > 0) {
+                System.out.println("Should be true: " + amount + " > " + balance + " && " + getTotalNumberOfHouses() + " > 0");
+                TradeBroker.sortAssetsByWorth(this);
 
-            balance = 0;
-
-            for (int i = 0; i < assets.size() && balance < amount; i++) {
-                if (assets.get(i).isMonopoly() && !assets.get(i).isMortgaged() && assets.get(i).getType() == Tile.TileType.PROPERTY) {
-                    ((PropertyTile) assets.get(i)).autoSellHouseOnMonopoly();
+                for (int i = 0; i < assets.size() && balance < amount; i++) {
+                    if (assets.get(i).isMonopoly() && !assets.get(i).isMortgaged() && assets.get(i).getType() == Tile.TileType.PROPERTY) {
+                        ((PropertyTile) assets.get(i)).autoSellHouseOnMonopoly();
+                        System.out.println(getAssets());
+                    }
                 }
             }
-        }
 
-        if (amount > balance) {
-            TradeBroker.sortAssetsByWorth(this);
+            if (amount > balance) {
+                TradeBroker.sortAssetsByWorth(this);
 
-            for (int i = 0; i < assets.size() && balance < amount; i++)
-                if (!assets.get(i).isMortgaged())
-                    assets.get(i).mortgage();
+                for (int i = 0; i < assets.size() && balance < amount; i++)
+                    if (!assets.get(i).isMortgaged())
+                        assets.get(i).mortgage();
+            }
         }
 
 
