@@ -1,5 +1,9 @@
 package Monopoly;
 
+import Monopoly.LoggerTools.Logger;
+
+import java.util.ArrayList;
+
 public abstract class OwnableTile extends Tile {
 
 
@@ -80,14 +84,19 @@ public abstract class OwnableTile extends Tile {
         return mortgaged;
     }
 
-    public boolean isMortgagable() {
-        return !mortgaged;
-    }
-
     public void mortgage() {
-        if (isMortgagable()) {
+        if (!mortgaged) {
             mortgaged = true;
             owner.addBalance(propertyValue / 2);
+            Logger.log(String.format("%s mortgaged %s for %d", owner, this, propertyValue / 2));
+        }
+    }
+
+    public void unmortgage() {
+        if (mortgaged && owner.getBalance() > 1.1 * (propertyValue / 2)) {
+            mortgaged = false;
+            owner.deductBalance((int) (1.1 * (propertyValue / 2)));
+            Logger.log(String.format("%s unmortgaged %s for %d", owner, this, propertyValue));
         }
     }
 
@@ -111,5 +120,15 @@ public abstract class OwnableTile extends Tile {
      * @return True if property belongs to an owned monopoly set; false otherwise
      */
     abstract boolean isMonopoly();
+
+    abstract ArrayList<? extends OwnableTile> getMonopolySet();
+
+    public String toString() {
+        if (isMortgaged()) {
+            return getName() + " (Mortgaged)";
+        }
+
+        return getName();
+    }
 
 }

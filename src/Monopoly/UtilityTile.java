@@ -1,5 +1,7 @@
 package Monopoly;
 
+import java.util.ArrayList;
+
 /**
  * The UtilityTile class is a subclass of Tile which has specific algorithms for getting rent amounts.
  */
@@ -13,6 +15,22 @@ public class UtilityTile extends OwnableTile {
      */
     UtilityTile(String name) {
         super(TileType.UTILITY, name, 150);
+    }
+
+    public ArrayList<UtilityTile> getMonopolySet() {
+        if (!isMonopoly()) return null;
+
+        ArrayList<UtilityTile> utilSet = new ArrayList<>();
+
+        for (int i = 0; i < owner.getAssets().size(); i++)
+            if (owner.getAssets().get(i).getType() == TileType.UTILITY)
+                utilSet.add((UtilityTile) owner.getAssets().get(i));
+
+        return utilSet;
+    }
+
+    public void mortgage() {
+
     }
 
     /**

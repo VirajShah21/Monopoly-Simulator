@@ -62,16 +62,21 @@ public class TradeOffer {
      * Send the offer to the recipient for negotiation
      */
     public void sendOffer() {
+        Logger.log(String.format("%s requested a trade with %s: %s and $%d for %s and $%d",
+                sender, receiver, senderTile, senderStake, receiverTile, receiverStake));
+
         if (getReceiverGain() > 0 && getSenderGain() > 0 && receiverStake > receiver.getBalance() * 0.45) {
             isFairTrade = true;
+            Logger.log(String.format("%s accepted the trade", receiver));
             return;
         } else if (getReceiverGain() > 0 && receiverStake > receiver.getBalance() * 0.45) {
             receiverStake = (int) (receiver.getBalance() * 0.45);
+            Logger.log(String.format("%s negotiated: %s wants %s and $%d for %s and $%d",
+                    receiver, receiver, senderTile, senderStake, receiverTile, receiverStake));
             negotiate();
         } else {
             if (getReceiverGain() < 0) {
                 receiverStake += getReceiverGain() - 1;
-
                 if (receiverStake < 0)
                     receiverStake = 0;
             }
@@ -79,6 +84,8 @@ public class TradeOffer {
             if (getReceiverGain() < 0) {
                 senderStake -= getReceiverGain() - 1;
             }
+            Logger.log(String.format("%s negotiated: %s wants %s and $%d for %s and $%d",
+                    receiver, receiver, senderTile, senderStake, receiverTile, receiverStake));
             negotiate();
         }
     }
@@ -88,8 +95,10 @@ public class TradeOffer {
      */
     public void negotiate() {
         if (getSenderGain() > 0 && getReceiverGain() > 0 && senderStake < sender.getBalance() * 0.45) {
+            Logger.log(String.format("%s accepted the trade", sender));
             isFairTrade = true;
         } else {
+            Logger.log(String.format("%s declined the trade", sender));
             isFairTrade = false;
         }
     }

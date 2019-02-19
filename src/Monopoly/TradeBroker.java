@@ -102,12 +102,12 @@ public class TradeBroker {
      * @param player The player whose assets are to be sorted
      */
     public static void sortAssetsByWorth(@NotNull Player player) {
-        ArrayList<Tile> assets = player.getAssets();
+        ArrayList<OwnableTile> assets = player.getAssets();
         if (assets.size() > 1) {
             for (int i = 0; i < assets.size() - 1; i++) {
                 for (int j = i + 1; j < assets.size(); j++) {
                     if (getAssetWorth(assets.get(i)) > getAssetWorth(assets.get(j))) {
-                        Tile tmp = assets.get(i);
+                        OwnableTile tmp = assets.get(i);
                         assets.set(i, assets.get(j));
                         assets.set(j, tmp);
                     }
@@ -121,15 +121,17 @@ public class TradeBroker {
      * Creates a "smart offer" for the sender, and allows negotiations to compromise on a deal
      *
      * @param sender   The Player creating the offer
-     * @param reciever The player receiving the offer
+     * @param receiver The player receiving the offer
      */
-    public static void createOffer(Player sender, Player reciever) {
+    public static void createOffer(Player sender, Player receiver) {
+        if (sender == receiver) return;
+
         sortAssetsByWorth(sender);
 
-        if (sender.getAssets().size() >= 2 && reciever.getAssets().size() >= 2) {
-            for (Tile t : reciever.getAssets()) {
+        if (sender.getAssets().size() >= 2 && receiver.getAssets().size() >= 2) {
+            for (Tile t : receiver.getAssets()) {
                 if (getAssetWorthToOther(t, sender) >= getAssetWorth(sender.getAssets().get(0))) {
-                    TradeOffer trade = new TradeOffer(sender, sender.getAssets().get(0), 0, reciever, t, 0);
+                    TradeOffer trade = new TradeOffer(sender, sender.getAssets().get(0), 0, receiver, t, 0);
                     trade.sendOffer();
                     if (trade.isFairTrade()) {
                         trade.execute();

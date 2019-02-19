@@ -42,7 +42,7 @@ public class Player {
     /**
      * An ArrayList of all the assets (Tiles) owned by a player
      */
-    private ArrayList<Tile> assets;
+    private ArrayList<OwnableTile> assets;
 
     /**
      * The game which the player belongs to
@@ -53,6 +53,8 @@ public class Player {
      * True if the player is in jail; false otherwise
      */
     private boolean inJail;
+
+    private int unpaidBalances;
 
     /**
      * Create a new Player and attach it to a monopoly game.
@@ -69,6 +71,7 @@ public class Player {
         getOutOfJailCards = 0;
         inJail = false;
         turnsInJail = 0;
+        unpaidBalances = 0;
     }
 
     /**
@@ -145,8 +148,8 @@ public class Player {
      *
      * @return The ArrayList of assets belonging to this player.
      */
-    public ArrayList<Tile> getAssets() {
-        return assets != null ? assets : new ArrayList<Tile>();
+    public ArrayList<OwnableTile> getAssets() {
+        return assets != null ? assets : new ArrayList<OwnableTile>();
     }
 
     /**
@@ -154,7 +157,7 @@ public class Player {
      *
      * @param asset A Tile which acts as a title deed.
      */
-    public void addAsset(Tile asset) {
+    public void addAsset(OwnableTile asset) {
         if (assets != null) assets.add(asset);
     }
 
@@ -211,7 +214,7 @@ public class Player {
 
         Tile currTile = game.tileAt(position);
         if (currTile.TYPE == Tile.TileType.PROPERTY || currTile.TYPE == Tile.TileType.RAILROAD || currTile.TYPE == Tile.TileType.UTILITY) {
-            OwnableTile tile = (OwnableTile)currTile;
+            OwnableTile tile = (OwnableTile) currTile;
 
             if (!tile.isOwned()) {
                 tile.buy(this);
@@ -273,6 +276,19 @@ public class Player {
             Logger.log(String.format("%s rolled doubles (%d). %s will roll again.", this, roll[0], this));
             playTurn();
         }
+
+        // If player can, un-mortgage properties, then do all this:
+        TradeBroker.sortAssetsByWorth(this);
+        for (int i = assets.size() - 1; i >= 0; i--) {
+            // If un-mortgage amount is less than a quarter of balance
+            if ((assets.get(i).getPropertyValue() / 2) * 1.1 < 0.25 * balance) {
+                assets.get(i).unmortgage();
+            }
+        }
+
+        if (balance == -1) {
+            game.getPlayers().remove(this);
+        }
     }
 
     /**
@@ -326,52 +342,62 @@ public class Player {
         }
     }
 
+    public int getTotalNumberOfHouses() {
+        int total = 0;
+
+        for (OwnableTile a : assets) {
+            if (a.getType() == Tile.TileType.PROPERTY) {
+                total += ((PropertyTile) a).getHouses();
+            }
+        }
+
+        return total;
+    }
+
     /**
-     * Dedcut balance from user. If they do not have enough money, they will sell get out of jail free cards and properties.
+     * Dedcut balance from user. If they do not have enough money, then player will mortgage properties.
      *
      * @param amount The amount to be deducted from the player's balance
      */
-    public void deductBalance(int amount) {
-        balance -= amount;
+    public boolean deductBalance(int amount) {
+        if (amount > balance) {
+            TradeBroker.sortAssetsByWorth(this);
 
-        while (balance < 0 && getOutOfJailCards == 0) {
-            getOutOfJailCards--;
-            addBalance(50);
+            for (int i = 0; i < assets.size(); i++)
+                if (!assets.get(i).isMonopoly() && !assets.get(i).isMortgaged())
+                    assets.get(i).mortgage();
         }
 
-        TradeBroker.sortAssetsByWorth(this);
-        while (balance < 0 && assets.size() == 0) {
-            try {
-                Tile getRid = assets.get(0);
-                if (getRid.TYPE == Tile.TileType.PROPERTY) {
-                    ((PropertyTile) getRid).foreclose();
-                } else if (getRid.TYPE == Tile.TileType.UTILITY) {
-                    ((UtilityTile) getRid).foreclose();
-                } else if (getRid.TYPE == Tile.TileType.RAILROAD) {
-                    ((RailroadTile) getRid).foreclose();
+        while (amount > balance && getTotalNumberOfHouses() > 0) {
+            TradeBroker.sortAssetsByWorth(this);
+
+            balance = 0;
+
+            for (int i = 0; i < assets.size() && balance < amount; i++) {
+                if (assets.get(i).isMonopoly() && !assets.get(i).isMortgaged() && assets.get(i).getType() == Tile.TileType.PROPERTY) {
+                    ((PropertyTile) assets.get(i)).autoSellHouseOnMonopoly();
                 }
-            } catch (NullPointerException e) {
-                break;
-            } catch (IndexOutOfBoundsException e) {
-                break;
             }
         }
 
-        if (balance < 0) {
-            while (assets.size() > 0) {
-                Tile getRid = assets.get(0);
-                if (getRid.TYPE == Tile.TileType.PROPERTY) {
-                    ((PropertyTile) getRid).foreclose();
-                } else if (getRid.TYPE == Tile.TileType.UTILITY) {
-                    ((UtilityTile) getRid).foreclose();
-                } else if (getRid.TYPE == Tile.TileType.RAILROAD) {
-                    ((RailroadTile) getRid).foreclose();
-                } else {
-                    assets.remove(0);
-                }
-            }
+        if (amount > balance) {
+            TradeBroker.sortAssetsByWorth(this);
 
-            getGame().getPlayers().remove(this);
+            for (int i = 0; i < assets.size() && balance < amount; i++)
+                if (!assets.get(i).isMortgaged())
+                    assets.get(i).mortgage();
+        }
+
+
+        if (amount > balance) {
+            unpaidBalances = amount - balance;
+            balance = -1;
+            Logger.log(String.format("Unable to deduct $%d from %s; player is now bankrupt with $%d in unpaid balance",
+                    amount, this, unpaidBalances));
+            return false;
+        } else {
+            balance -= amount;
+            return true;
         }
     }
 
@@ -391,9 +417,21 @@ public class Player {
      * @param amount The amount of money to transfer.
      */
     public void payTo(Player other, int amount) {
-        deductBalance(amount);
-        other.addBalance(amount);
-        Logger.log(String.format("%s paid %s $%d", this, other, amount));
+        Logger.log(String.format("A transfer of $%d from %s to %s has been opened", amount, this, other));
+
+        boolean paidInFull = deductBalance(amount);
+
+        if (paidInFull) {
+            other.addBalance(amount);
+            Logger.log(String.format("\t%s paid %s $%d in full", this, other, amount));
+        } else {
+            other.addBalance(amount - unpaidBalances);
+            other.assets.addAll(this.assets);
+            this.assets.clear();
+            Logger.log(String.format("\t%s bankrupted %s; %s recieved $%d and all %s's assets", other, this, other, amount - unpaidBalances, this));
+        }
+
+        Logger.log("The transfer has closed");
     }
 
     /**

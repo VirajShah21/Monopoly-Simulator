@@ -1,5 +1,7 @@
 package Monopoly;
 
+import java.util.ArrayList;
+
 /**
  * The RailRoad class is an extension of Tile, with a unique algorithm to get rent based on ownership of other railroads
  */
@@ -11,6 +13,23 @@ public class RailroadTile extends OwnableTile {
      */
     public RailroadTile(String name) {
         super(TileType.RAILROAD, name, 200);
+    }
+
+    public void mortgage() {
+        owner.addBalance(propertyValue / 2);
+        mortgaged = true;
+    }
+
+    public ArrayList<RailroadTile> getMonopolySet() {
+        if (!isMonopoly()) return null;
+
+        ArrayList<RailroadTile> railroads = new ArrayList<>();
+
+        for (int i = 0; i < owner.getAssets().size(); i++)
+            if (owner.getAssets().get(i).getType() == TileType.RAILROAD)
+                railroads.add((RailroadTile) owner.getAssets().get(i));
+
+        return railroads;
     }
 
     /**

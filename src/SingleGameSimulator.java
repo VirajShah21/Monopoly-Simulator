@@ -18,5 +18,7 @@ public class SingleGameSimulator {
                 System.out.println(p.toString() + ": " + p.getAssets().toString());
             System.out.println("\n\n");
         }
+
+        System.out.println("Final players: " + game.getPlayers());
     }
 }

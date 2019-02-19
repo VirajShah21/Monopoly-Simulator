@@ -95,15 +95,12 @@ public class MonopolyGame {
         if (tile.TYPE == Tile.TileType.PROPERTY || tile.TYPE == Tile.TileType.RAILROAD) {
             Logger.log(String.format("%s payed $%d %s for rent on %s",
                     payer, tile.getRent(), tile.getOwner(), tile));
-
-            payer.deductBalance(tile.getRent());
-            tile.getOwner().addBalance(tile.getRent());
+            payer.payTo(tile.getOwner(), tile.getRent());
         } else if (tile.TYPE == Tile.TileType.UTILITY) {
             ((UtilityTile) tile).setLastDiceRoll(roll);
-            Logger.log(String.format("%s payed $%d %s for rent on %s",
+            Logger.log(String.format("%s is paying $%d %s for rent on %s",
                     payer, tile.getRent(), tile.getOwner(), tile));
-            payer.deductBalance(tile.getRent());
-            tile.getOwner().addBalance(tile.getRent());
+            payer.payTo(tile.getOwner(), tile.getRent());
         } else {
             System.out.println("Logic Error: Paying rent on non-ownable property");
         }

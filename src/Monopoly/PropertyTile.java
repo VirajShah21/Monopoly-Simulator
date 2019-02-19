@@ -2,6 +2,8 @@ package Monopoly;
 
 import Monopoly.LoggerTools.Logger;
 
+import java.util.ArrayList;
+
 /**
  * The PropertyTile is an subclass of Tile. It contains fields associated more specifically with those of colored
  * properties on a Monopoly game board.
@@ -42,6 +44,22 @@ public class PropertyTile extends OwnableTile {
         this.group = group;
     }
 
+    public void mortgage() {
+        if (isMonopoly()) {
+            ArrayList<PropertyTile> colorSet = getMonopolySet();
+
+            for (int i = 0; i < colorSet.size(); i++) {
+                while (colorSet.get(i).getHouses() > 0) {
+                    colorSet.get(i).sellHouse();
+                }
+            }
+        }
+
+        owner.addBalance(propertyValue / 2);
+        mortgaged = true;
+    }
+
+
     /**
      * @return The number of houses belonging to this property
      */
@@ -51,7 +69,7 @@ public class PropertyTile extends OwnableTile {
         } else {
             return houses;
         }
-    }
+    } // TODO: Rename to getNumberOfHouses
 
     /**
      * @return True if a hotel belongs to the property; false otherwise
@@ -126,7 +144,7 @@ public class PropertyTile extends OwnableTile {
     /**
      * Purchases a house; automatically deducts balance from purchasing player and increments hosue counter
      */
-    public void buyHouse() {
+    public boolean buyHouse() {
         if (allowedToBuild()) {
             owner.deductBalance(getHousePrice());
             this.houses++;
@@ -136,6 +154,48 @@ public class PropertyTile extends OwnableTile {
             } else {
                 Logger.log(String.format("%s bought a hotel on %s for $%d", owner, this, getHousePrice()));
             }
+            return true;
+        }
+        return false;
+    }
+
+    // TODO: Create abstract getMonopolySet in OwnableTile and override it Railroad & Utility Tile classes
+    public ArrayList<PropertyTile> getMonopolySet() {
+        if (!isMonopoly()) return null;
+
+        ArrayList<PropertyTile> colorSet = new ArrayList<>();
+
+        for (int i = 0; i < owner.getAssets().size(); i++) {
+            if (owner.getAssets().get(i).getType() == TileType.PROPERTY) {
+                PropertyTile currTile = (PropertyTile) owner.getAssets().get(i);
+                if (currTile.getGroupNumber() == getGroupNumber())
+                    colorSet.add(currTile);
+            }
+        }
+
+        return colorSet;
+    }
+
+
+    public void sellHouse() {
+        if (houses > 0) {
+            houses--;
+            owner.addBalance(getHousePrice() / 2);
+            Logger.log(String.format("%s sold a house on %s", owner, this));
+        }
+    }
+
+    public void autoSellHouseOnMonopoly() {
+        if (isMonopoly()) {
+            ArrayList<PropertyTile> colorSet = getMonopolySet();
+
+            PropertyTile highestProperty = colorSet.get(0);
+
+            for (int i = 1; i < colorSet.size(); i++)
+                if (colorSet.get(i).getHouses() > highestProperty.getHouses())
+                    highestProperty = colorSet.get(i);
+
+            highestProperty.sellHouse();
         }
     }
 
@@ -160,16 +220,12 @@ public class PropertyTile extends OwnableTile {
         return false;
     }
 
-    public boolean isMortgagable() {
-        return super.isMortgagable() && houses == 0;
-    }
-
     /**
      * @return The name of the property with the number of houses or hotels;
      * if no buildings are on the property then just the property name will show up
      */
     public String toString() {
         String append = houses <= 4 && houses > 0 ? " (" + houses + " houses)" : (hasHotel() ? " (w/ Hotel)" : null);
-        return String.format("%s%s", NAME, append == null ? "" : append);
+        return String.format("%s%s %s", NAME, append == null ? "" : append, isMortgaged() ? "(Mortgaged)" : "");
     }
 }

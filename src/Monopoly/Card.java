@@ -128,8 +128,8 @@ public class Card {
                     int houseAmount = Integer.parseInt(words[2]);
                     int hotelAmount = Integer.parseInt(words[3]);
                     int totalFee = 0;
-                    ArrayList<Tile> playerAssets = player.getAssets();
-                    for (Tile asset : player.getAssets()) {
+                    ArrayList<OwnableTile> playerAssets = player.getAssets();
+                    for (OwnableTile asset : player.getAssets()) {
                         if (asset.TYPE == Tile.TileType.PROPERTY) {
                             PropertyTile property = (PropertyTile) asset;
                             totalFee += property.hasHotel() ?
