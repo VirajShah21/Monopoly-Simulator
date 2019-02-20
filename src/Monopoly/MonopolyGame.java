@@ -24,6 +24,16 @@ public class MonopolyGame {
     private int currentPlayer;
 
     /**
+     * A counter for the number of turns played
+     */
+    private int turnsPlayed;
+
+    /**
+     * The maximum turns allowed to be played during a game
+     */
+    private final int maxTurnsAllowed = 10000;
+
+    /**
      * Initializes a new monopoly game with a new board, and four players.
      */
     public MonopolyGame() {
@@ -36,6 +46,15 @@ public class MonopolyGame {
         players.add(new Player("West", this));
 
         currentPlayer = -1;
+        turnsPlayed = 0;
+    }
+
+    /**
+     * Checks if the game is still in a playable state
+     * @return True if the game is still in a playable state, false otherwise
+     */
+    public boolean isRunning() {
+        return turnsPlayed < maxTurnsAllowed && players.size() > 1;
     }
 
     /**
@@ -64,7 +83,11 @@ public class MonopolyGame {
      * Calls upon a player to play their turn
      */
     public void playTurn() {
-        players.get(currentPlayer).playTurn();
+        turnsPlayed++;
+
+        if (turnsPlayed < maxTurnsAllowed) {
+            players.get(currentPlayer).playTurn();
+        }
     }
 
     /**

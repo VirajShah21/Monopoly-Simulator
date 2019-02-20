@@ -1,7 +1,6 @@
 import Monopoly.LoggerTools.LandingLog;
 import Monopoly.LoggerTools.Logger;
 import Monopoly.MonopolyGame;
-import Monopoly.Player;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,27 +11,26 @@ import java.util.Arrays;
 class TileProfitabilitySimulator {
 
     public static void main(String[] args) {
-        Logger.printLogsWhenCreated = false;
+        Logger.printLogsWhenCreated = true;
 
 
         MonopolyGame game = new MonopolyGame();
         System.out.println("Progress: |                    |");
         System.out.print("           ");
         for (int i = 0; i < 1000; i++) {
-            while (game.getPlayers().size() > 1) {
+            while (game.isRunning()) {
                 game.nextPlayer();
                 game.playTurn();
-
-                if (i % 50 == 0) System.out.print("=");
             }
-            System.out.println();
-
+            if (i % 50 == 0) System.out.print("=");
             game = new MonopolyGame();
-            // At bottom so that initialization occurs during declaration to avoid "game may not be initialized" error
+            Logger.clearAllMessageLogs();
         }
+        System.out.println();
 
         int landingLogSize = Logger.getLandingLogStream().size();
         ArrayList<LandingLog> landingLogs = Logger.getLandingLogStream();
+
         int[] tileFrequency = new int[40];
         int[] tileProfits = new int[40];
 

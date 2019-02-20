@@ -253,7 +253,7 @@ public class Player {
             Logger.log(new LandingLog(name, position, 0));
         }
 
-        if (!isBankrupt() && assets.size() > 3 && game.getPlayers().size() > 2)
+        if (!isBankrupt())
             for (Player p : game.getPlayers())
                 if (!p.isBankrupt())
                     TradeBroker.createOffer(this, p);
@@ -354,6 +354,32 @@ public class Player {
         return total;
     }
 
+    private void escapeBankruptcy(int amount) {
+        if (balance < amount) {
+            TradeBroker.sortAssetsByWorth(this);
+
+            for (int i = 0; i < assets.size(); i++)
+                if (assets.get(i).isMonopoly() && !assets.get(i).isMortgaged() && assets.get(i).TYPE != Tile.TileType.PROPERTY)
+                    assets.get(i).mortgage();
+        }
+
+
+        TradeBroker.sortAssetsByWorth(this);
+        for (int i = 0; i < assets.size() && balance < amount; i++)
+            if (assets.get(i).isMonopoly() && assets.get(i).getType() == Tile.TileType.PROPERTY)
+                while (balance < amount && ((PropertyTile) assets.get(i)).getHousesInMonopolySet() > 0)
+                    ((PropertyTile) assets.get(i)).autoSellHouseOnMonopoly();
+
+
+        if (balance < amount) {
+            TradeBroker.sortAssetsByWorth(this);
+
+            for (int i = 0; i < assets.size() && balance < amount; i++)
+                if (!assets.get(i).isMortgaged())
+                    assets.get(i).mortgage();
+        }
+    }
+
     /**
      * Dedcut balance from user. If they do not have enough money, then player will mortgage properties.
      *
@@ -361,35 +387,7 @@ public class Player {
      */
     public boolean deductBalance(int amount) {
         if (amount > balance) {
-            TradeBroker.sortAssetsByWorth(this);
-
-            for (int i = 0; i < assets.size(); i++)
-                if (!assets.get(i).isMonopoly() && !assets.get(i).isMortgaged())
-                    assets.get(i).mortgage();
-
-            while (amount > balance && getTotalNumberOfHouses() > 0) {
-                System.out.println("Should be true: " + amount + " > " + balance + " && " + getTotalNumberOfHouses() + " > 0");
-                TradeBroker.sortAssetsByWorth(this);
-
-                for (int i = 0; i < assets.size() && balance < amount; i++) {
-                    if (assets.get(i).isMonopoly() && !assets.get(i).isMortgaged() && assets.get(i).getType() == Tile.TileType.PROPERTY) {
-                        ((PropertyTile) assets.get(i)).autoSellHouseOnMonopoly();
-                        System.out.println(getAssets());
-                    }
-                }
-            }
-
-            if (amount > balance) {
-                TradeBroker.sortAssetsByWorth(this);
-
-                for (int i = 0; i < assets.size() && balance < amount; i++)
-                    if (!assets.get(i).isMortgaged())
-                        assets.get(i).mortgage();
-            }
-        }
-
-
-        if (amount > balance) {
+            escapeBankruptcy(amount);
             unpaidBalances = amount - balance;
             balance = -1;
             Logger.log(String.format("Unable to deduct $%d from %s; player is now bankrupt with $%d in unpaid balance",

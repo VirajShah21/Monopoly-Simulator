@@ -9,7 +9,7 @@ public class SingleGameSimulator {
 
         MonopolyGame game = new MonopolyGame();
 
-        while (game.getPlayers().size() > 1) {
+        while (game.isRunning()) {
             game.nextPlayer();
             game.playTurn();
 

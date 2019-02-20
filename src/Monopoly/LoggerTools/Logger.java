@@ -69,8 +69,14 @@ public class Logger {
     /**
      * Clears out all the logs from all the streams
      */
-    public static void clear() {
-        logs = new ArrayList<>();
-
+    public static void clearAll() {
+        logs.clear();
+        landings.clear();
     }
+
+    public static void clearAllMessageLogs() {
+        logs.clear();
+    }
+
+    public static void clearAllLandingLogs() { landings.clear(); }
 }

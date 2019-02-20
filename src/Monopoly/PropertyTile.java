@@ -44,8 +44,24 @@ public class PropertyTile extends OwnableTile {
         this.group = group;
     }
 
-    public void setNumberOfHouses(int n) {
+    /**
+     * Sets the number of houses on a property
+     *
+     * @param n The number of houses to be set
+     */
+    void setNumberOfHouses(int n) {
         houses = n;
+    }
+
+    public int getHousesInMonopolySet() {
+        int group = getGroupNumber();
+        int count = 0;
+        for (OwnableTile t: owner.getAssets()) {
+            if (t.TYPE == TileType.PROPERTY && ((PropertyTile)t).getGroupNumber() == group) {
+                count += ((PropertyTile)t).getHouses();
+            }
+        }
+        return count;
     }
 
     /**
