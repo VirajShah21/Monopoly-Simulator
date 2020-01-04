@@ -2,6 +2,12 @@ package Monopoly;
 
 import java.util.ArrayList;
 
+import Monopoly.Tiles.OwnableTile;
+import Monopoly.Tiles.PropertyTile;
+import Monopoly.Tiles.RailroadTile;
+import Monopoly.Tiles.Tile;
+import Monopoly.Tiles.UtilityTile;
+
 /**
  * The TradeBroker class, when implemented, allows for automated players to
  * create trade offers, accept offers, deny offers, etc
@@ -17,7 +23,7 @@ public class TradeBroker {
 	public static int getAssetWorth(Tile tile) {
 		int eval = 0;
 
-		if (tile.TYPE == Tile.TileType.PROPERTY) {
+		if (tile.getType() == Tile.TileType.PROPERTY) {
 			PropertyTile property = (PropertyTile) tile;
 
 			eval = property.getPropertyValue() + 200;
@@ -35,7 +41,7 @@ public class TradeBroker {
 				int colorGroupInOwnership = 0;
 
 				for (Tile t : property.getOwner().getAssets())
-					if (t.TYPE == Tile.TileType.PROPERTY)
+					if (t.getType() == Tile.TileType.PROPERTY)
 						if (((PropertyTile) t).getGroupNumber() == colorGroup)
 							colorGroupInOwnership++;
 
@@ -43,14 +49,14 @@ public class TradeBroker {
 					if (colorGroupInOwnership == 2)
 						eval += 250;
 			}
-		} else if (tile.TYPE == Tile.TileType.UTILITY) {
+		} else if (tile.getType() == Tile.TileType.UTILITY) {
 			UtilityTile property = (UtilityTile) tile;
 
 			eval = property.getPropertyValue() + 200;
 
 			if (property.isMonopoly())
 				eval *= 2;
-		} else if (tile.TYPE == Tile.TileType.RAILROAD) {
+		} else if (tile.getType() == Tile.TileType.RAILROAD) {
 			RailroadTile property = (RailroadTile) tile;
 
 			eval = property.getPropertyValue() + (int) (property.getRent() / 200.0 * 4) + 200;
@@ -69,21 +75,21 @@ public class TradeBroker {
 	public static int getAssetWorthToOther(Tile tile, Player player) {
 		int eval = 0;
 
-		if (tile.TYPE == Tile.TileType.PROPERTY) {
+		if (tile.getType() == Tile.TileType.PROPERTY) {
 			PropertyTile property = (PropertyTile) tile;
 
 			eval = property.getPropertyValue() + 200;
 			if (property.isMonopoly()) {
 				eval = 0;
 			}
-		} else if (tile.TYPE == Tile.TileType.UTILITY) {
+		} else if (tile.getType() == Tile.TileType.UTILITY) {
 			UtilityTile property = (UtilityTile) tile;
 
 			eval = property.getPropertyValue() + 200;
 
 			if (property.isMonopoly())
 				eval *= 2;
-		} else if (tile.TYPE == Tile.TileType.RAILROAD) {
+		} else if (tile.getType() == Tile.TileType.RAILROAD) {
 			RailroadTile property = (RailroadTile) tile;
 
 			eval = property.getPropertyValue() + (int) (property.getRent() / 200.0 * 4) + 200;

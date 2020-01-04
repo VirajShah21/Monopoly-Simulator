@@ -1,4 +1,4 @@
-package Monopoly;
+package Monopoly.Tiles;
 
 import java.util.ArrayList;
 

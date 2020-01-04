@@ -1,6 +1,12 @@
 package Monopoly;
 
 import Monopoly.LoggerTools.Logger;
+import Monopoly.Tiles.FreeParkingTile;
+import Monopoly.Tiles.OwnableTile;
+import Monopoly.Tiles.PropertyTile;
+import Monopoly.Tiles.RailroadTile;
+import Monopoly.Tiles.Tile;
+import Monopoly.Tiles.UtilityTile;
 
 import java.util.ArrayList;
 
@@ -130,7 +136,7 @@ public class Card {
                     int totalFee = 0;
                     ArrayList<OwnableTile> playerAssets = player.getAssets();
                     for (OwnableTile asset : player.getAssets()) {
-                        if (asset.TYPE == Tile.TileType.PROPERTY) {
+                        if (asset.getType() == Tile.TileType.PROPERTY) {
                             PropertyTile property = (PropertyTile) asset;
                             totalFee += property.hasHotel() ?
                                     hotelAmount : property.getHouses() * houseAmount;

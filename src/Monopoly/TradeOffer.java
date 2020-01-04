@@ -1,6 +1,10 @@
 package Monopoly;
 
 import Monopoly.LoggerTools.Logger;
+import Monopoly.Tiles.PropertyTile;
+import Monopoly.Tiles.RailroadTile;
+import Monopoly.Tiles.Tile;
+import Monopoly.Tiles.UtilityTile;
 
 public class TradeOffer {
     /**
@@ -134,22 +138,22 @@ public class TradeOffer {
         sender.addBalance(receiverStake);
         receiver.deductBalance(receiverStake);
 
-        if (senderTile.TYPE == Tile.TileType.PROPERTY) {
+        if (senderTile.getType() == Tile.TileType.PROPERTY) {
             ((PropertyTile) senderTile).transferOwnership(receiver);
-        } else if (senderTile.TYPE == Tile.TileType.RAILROAD) {
+        } else if (senderTile.getType() == Tile.TileType.RAILROAD) {
             ((RailroadTile) senderTile).transferOwnership(receiver);
-        } else if (senderTile.TYPE == Tile.TileType.UTILITY) {
+        } else if (senderTile.getType() == Tile.TileType.UTILITY) {
             ((UtilityTile) senderTile).transferOwnership(receiver);
         } else {
             System.out.println(senderTile + " is not an ownable asset");
             return;
         }
 
-        if (receiverTile.TYPE == Tile.TileType.PROPERTY) {
+        if (receiverTile.getType() == Tile.TileType.PROPERTY) {
             ((PropertyTile) receiverTile).transferOwnership(sender);
-        } else if (receiverTile.TYPE == Tile.TileType.RAILROAD) {
+        } else if (receiverTile.getType() == Tile.TileType.RAILROAD) {
             ((RailroadTile) receiverTile).transferOwnership(sender);
-        } else if (receiverTile.TYPE == Tile.TileType.UTILITY) {
+        } else if (receiverTile.getType() == Tile.TileType.UTILITY) {
             ((UtilityTile) receiverTile).transferOwnership(sender);
         } else {
             System.out.println(receiverTile + " is not an ownable asset");
@@ -158,7 +162,6 @@ public class TradeOffer {
 
         Logger.log(String.format("%s and %s executed a trade: %s and $%d for %s and %d",
                 sender, receiver, senderTile, senderStake, receiverTile, receiverStake));
-
     }
 
     /**

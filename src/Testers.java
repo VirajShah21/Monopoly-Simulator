@@ -1,4 +1,6 @@
 import Monopoly.*;
+import Monopoly.Tiles.PropertyTile;
+import Monopoly.Tiles.UtilityTile;
 
 class Testers {
     static void sortAssetsByWorth() {

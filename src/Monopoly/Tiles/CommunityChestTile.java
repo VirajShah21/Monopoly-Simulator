@@ -1,4 +1,4 @@
-package Monopoly;
+package Monopoly.Tiles;
 
 /**
  * The CommunityChestTile class is a vestigial subclass of Tile. The main distinction is that

@@ -1,4 +1,4 @@
-package Monopoly;
+package Monopoly.Tiles;
 
 
 /**
@@ -9,7 +9,7 @@ public abstract class Tile {
     /**
      * Enumeration used to express the type of tile the current *Tile object refers to
      */
-    enum TileType {
+    public static enum TileType {
         PROPERTY, UTILITY, RAILROAD, CHANCE, COMMUNITY_CHEST, TAX, FREE_PARKING,
         GO_TO_JAIL, JAIL, GO
     }
@@ -38,7 +38,7 @@ public abstract class Tile {
     /**
      * @return The type of instance of a Tile subclass
      */
-    TileType getType() {
+    public TileType getType() {
         return TYPE;
     }
 
@@ -55,7 +55,7 @@ public abstract class Tile {
      *
      * @return The Monopoly game board which was built
      */
-    static Tile[] buildBoard() {
+    public static Tile[] buildBoard() {
         Tile[] out = new Tile[40];
 
         out[0] = new GoTile();

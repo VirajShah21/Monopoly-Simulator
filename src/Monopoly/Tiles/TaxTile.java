@@ -1,4 +1,4 @@
-package Monopoly;
+package Monopoly.Tiles;
 
 /**
  * The TaxTile class is an extension of Tile, with no internal differences in functionality

@@ -1,5 +1,6 @@
-package Monopoly;
+package Monopoly.Tiles;
 
+import Monopoly.Player;
 import Monopoly.LoggerTools.Logger;
 
 import java.util.ArrayList;
@@ -116,21 +117,21 @@ public abstract class OwnableTile extends Tile {
      *
      * @return The value of the property
      */
-    abstract int getPropertyValue();
+    public abstract int getPropertyValue();
 
     /**
      * Get the rent as a result of landing on the ownable tile
      *
      * @return The rent of landing on the tile
      */
-    abstract int getRent();
+    public abstract int getRent();
 
     /**
      * Checks to see if the ownable tile is a monopoly
      *
      * @return True if property belongs to an owned monopoly set; false otherwise
      */
-    abstract boolean isMonopoly();
+    public abstract boolean isMonopoly();
 
     /**
      *

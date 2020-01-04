@@ -1,6 +1,9 @@
 package Monopoly;
 
 import Monopoly.LoggerTools.Logger;
+import Monopoly.Tiles.OwnableTile;
+import Monopoly.Tiles.Tile;
+import Monopoly.Tiles.UtilityTile;
 
 import java.util.ArrayList;
 
@@ -115,11 +118,11 @@ public class MonopolyGame {
      * @param roll  The dice roll
      */
     public void payRent(Player payer, OwnableTile tile, int roll) {
-        if (tile.TYPE == Tile.TileType.PROPERTY || tile.TYPE == Tile.TileType.RAILROAD) {
+        if (tile.getType() == Tile.TileType.PROPERTY || tile.getType() == Tile.TileType.RAILROAD) {
             Logger.log(String.format("%s is paying $%d to %s for rent on %s",
                     payer, tile.getRent(), tile.getOwner(), tile));
             payer.payTo(tile.getOwner(), tile.getRent());
-        } else if (tile.TYPE == Tile.TileType.UTILITY) {
+        } else if (tile.getType() == Tile.TileType.UTILITY) {
             ((UtilityTile) tile).setLastDiceRoll(roll);
             Logger.log(String.format("%s is paying $%d to %s for rent on %s",
                     payer, tile.getRent(), tile.getOwner(), tile));
@@ -136,7 +139,7 @@ public class MonopolyGame {
      * @param tile  The tile to pay rent on
      */
     public void payRent(Player payer, OwnableTile tile) {
-        if (tile.TYPE == Tile.TileType.PROPERTY || tile.TYPE == Tile.TileType.RAILROAD) {
+        if (tile.getType() == Tile.TileType.PROPERTY || tile.getType() == Tile.TileType.RAILROAD) {
             Logger.log(String.format("%s payed $%d %s for rent on %s",
                     payer, tile.getRent(), tile.getOwner(), tile));
 

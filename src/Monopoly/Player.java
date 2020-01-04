@@ -2,6 +2,12 @@ package Monopoly;
 
 import Monopoly.LoggerTools.LandingLog;
 import Monopoly.LoggerTools.Logger;
+import Monopoly.Tiles.FreeParkingTile;
+import Monopoly.Tiles.OwnableTile;
+import Monopoly.Tiles.PropertyTile;
+import Monopoly.Tiles.RailroadTile;
+import Monopoly.Tiles.Tile;
+import Monopoly.Tiles.UtilityTile;
 
 import java.util.ArrayList;
 
@@ -215,8 +221,8 @@ public class Player {
 		Logger.log(String.format("%s moved to %s", this, game.tileAt(position)));
 
 		Tile currTile = game.tileAt(position);
-		if (currTile.TYPE == Tile.TileType.PROPERTY || currTile.TYPE == Tile.TileType.RAILROAD
-				|| currTile.TYPE == Tile.TileType.UTILITY) {
+		if (currTile.getType() == Tile.TileType.PROPERTY || currTile.getType() == Tile.TileType.RAILROAD
+				|| currTile.getType() == Tile.TileType.UTILITY) {
 			OwnableTile tile = (OwnableTile) currTile;
 
 			if (!tile.isOwned()) {
@@ -228,24 +234,24 @@ public class Player {
 			} else {
 				Logger.log(new LandingLog(name, position, 0));
 			}
-		} else if (currTile.TYPE == Tile.TileType.CHANCE) {
+		} else if (currTile.getType() == Tile.TileType.CHANCE) {
 			Card chanceCard = Card.pickRandomCard(Card.chanceDeck);
 			chanceCard.pickup(this);
 			Logger.log(new LandingLog(name, position, 0));
-		} else if (currTile.TYPE == Tile.TileType.COMMUNITY_CHEST) {
+		} else if (currTile.getType() == Tile.TileType.COMMUNITY_CHEST) {
 			Card ccCard = Card.pickRandomCard(Card.communityChestDeck);
 			ccCard.pickup(this);
 			Logger.log(new LandingLog(name, position, 0));
-		} else if (currTile.TYPE == Tile.TileType.GO_TO_JAIL) {
+		} else if (currTile.getType() == Tile.TileType.GO_TO_JAIL) {
 			setPosition(10);
 			goToJail();
 			Logger.log(new LandingLog(name, position, 0));
-		} else if (currTile.TYPE == Tile.TileType.FREE_PARKING) {
+		} else if (currTile.getType() == Tile.TileType.FREE_PARKING) {
 			int poolSize = ((FreeParkingTile) currTile).getPoolAmount();
 			this.addBalance(poolSize);
 			((FreeParkingTile) currTile).clearPool();
 			Logger.log(new LandingLog(name, position, 0));
-		} else if (currTile.TYPE == Tile.TileType.TAX) {
+		} else if (currTile.getType() == Tile.TileType.TAX) {
 			if (position == 4) {
 				deductBalance(200);
 				((FreeParkingTile) game.tileAt(20)).addToPool(200);
@@ -264,7 +270,7 @@ public class Player {
 		TradeBroker.sortAssetsByWorth(this);
 
 		for (OwnableTile asset : assets) {
-			if (asset.TYPE == Tile.TileType.PROPERTY) {
+			if (asset.getType() == Tile.TileType.PROPERTY) {
 				PropertyTile property = (PropertyTile) asset;
 
 				while (property.getHousePrice() < 0.25 * balance && !property.hasHotel() && property.allowedToBuild()) {
@@ -304,12 +310,12 @@ public class Player {
 		for (int i = 0; i < rankings.length; i++) {
 			Tile asset = assets.get(i);
 
-			if (asset.TYPE == Tile.TileType.UTILITY) {
+			if (asset.getType() == Tile.TileType.UTILITY) {
 				rankings[i] = 7;
 				if (((UtilityTile) asset).isMonopoly())
 					rankings[i] -= 2;
 
-			} else if (asset.TYPE == Tile.TileType.PROPERTY) {
+			} else if (asset.getType() == Tile.TileType.PROPERTY) {
 				rankings[i] = 5;
 				if (((PropertyTile) asset).isMonopoly()) {
 					rankings[i] -= 2;
@@ -323,7 +329,7 @@ public class Player {
 					}
 				}
 
-			} else if (asset.TYPE == Tile.TileType.RAILROAD) {
+			} else if (asset.getType() == Tile.TileType.RAILROAD) {
 				rankings[i] = 5;
 				rankings[i] -= ((RailroadTile) asset).railroadsInSet();
 			}
@@ -359,7 +365,7 @@ public class Player {
 
 			for (int i = 0; i < assets.size(); i++)
 				if (assets.get(i).isMonopoly() && !assets.get(i).isMortgaged()
-						&& assets.get(i).TYPE != Tile.TileType.PROPERTY)
+						&& assets.get(i).getType() != Tile.TileType.PROPERTY)
 					assets.get(i).mortgage();
 		}
 
@@ -379,7 +385,7 @@ public class Player {
 	}
 
 	/**
-	 * Dedcut balance from user. If they do not have enough money, then player will
+	 * Deduct balance from user. If they do not have enough money, then player will
 	 * mortgage properties.
 	 *
 	 * @param amount The amount to be deducted from the player's balance
