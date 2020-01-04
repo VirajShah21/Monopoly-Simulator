@@ -1,0 +1,24 @@
+import Monopoly.MonopolyGame;
+import Monopoly.Player;
+import Monopoly.LoggerTools.Logger;
+
+public class GameSimulator {
+	public static void main(String[] args) {
+        Logger.printLogsWhenCreated = true;
+
+
+        MonopolyGame game = new MonopolyGame();
+
+        while (game.isRunning()) {
+            game.nextPlayer();
+            game.playTurn();
+
+            System.out.println("\n\n");
+            for (Player p : game.getPlayers())
+                System.out.println(p.toString() + ": " + p.getAssets().toString());
+            System.out.println("\n\n");
+        }
+
+        System.out.println("Final players: " + game.getPlayers());
+    }
+}
