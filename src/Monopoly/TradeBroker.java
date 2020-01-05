@@ -1,147 +1,255 @@
 package Monopoly;
 
-import java.util.ArrayList;
+import java.util.*;
 
-import Monopoly.Tiles.OwnableTile;
-import Monopoly.Tiles.PropertyTile;
-import Monopoly.Tiles.RailroadTile;
-import Monopoly.Tiles.Tile;
-import Monopoly.Tiles.UtilityTile;
+import Monopoly.Tiles.*;
 
 /**
  * The TradeBroker class, when implemented, allows for automated players to
  * create trade offers, accept offers, deny offers, etc
  */
 public class TradeBroker {
-	/**
-	 * Get the worth of a player holding onto an asset
-	 *
-	 * @param tile The tile which is in question; If not PropertyTile, RailroadTile,
-	 *             or UtilityTile, then the tiles worth will be 0
-	 * @return The worth of a tile to the player who owns it
-	 */
-	public static int getAssetWorth(Tile tile) {
-		int eval = 0;
+	private Player client;
 
-		if (tile.getType() == Tile.TileType.PROPERTY) {
-			PropertyTile property = (PropertyTile) tile;
-
-			eval = property.getPropertyValue() + 200;
-			if (property.isMonopoly()) {
-				eval *= 2;
-
-				if (property.getHouses() <= 3)
-					eval += (int) Math.pow(10, property.getHouses());
-				else if (property.getHouses() == 4)
-					eval += 1500;
-				else if (property.getHouses() == 5)
-					eval += 2500;
-			} else {
-				int colorGroup = property.getGroupNumber();
-				int colorGroupInOwnership = 0;
-
-				for (Tile t : property.getOwner().getAssets())
-					if (t.getType() == Tile.TileType.PROPERTY)
-						if (((PropertyTile) t).getGroupNumber() == colorGroup)
-							colorGroupInOwnership++;
-
-				if (!(colorGroup == 1 || colorGroup == 8))
-					if (colorGroupInOwnership == 2)
-						eval += 250;
-			}
-		} else if (tile.getType() == Tile.TileType.UTILITY) {
-			UtilityTile property = (UtilityTile) tile;
-
-			eval = property.getPropertyValue() + 200;
-
-			if (property.isMonopoly())
-				eval *= 2;
-		} else if (tile.getType() == Tile.TileType.RAILROAD) {
-			RailroadTile property = (RailroadTile) tile;
-
-			eval = property.getPropertyValue() + (int) (property.getRent() / 200.0 * 4) + 200;
-		}
-
-		return eval - 100;
+	public TradeBroker(Player client) {
+		this.client = client;
 	}
 
-	/**
-	 * Get the personal evaluation of a property when belonging to another player
-	 *
-	 * @param tile   The tile (ownable tile) which is in question
-	 * @param player The player who the evaluation is for
-	 * @return The worth of an asset to player who does not own it yet
-	 */
-	public static int getAssetWorthToOther(Tile tile, Player player) {
-		int eval = 0;
+	private HashMap<OwnableTile, Double> getSetCompletions() {
+		HashMap<OwnableTile, Double> completionRates = new HashMap<>();
 
-		if (tile.getType() == Tile.TileType.PROPERTY) {
-			PropertyTile property = (PropertyTile) tile;
-
-			eval = property.getPropertyValue() + 200;
-			if (property.isMonopoly()) {
-				eval = 0;
+		for (OwnableTile asset : client.getAssets()) {
+			if (asset.getType() == Tile.TileType.PROPERTY) {
+				int group = ((PropertyTile) asset).getGroupNumber();
+				int count = 0;
+				int setMaxCount = group == 1 || group == 8 ? 2 : 3;
+				for (OwnableTile comparableAsset : client.getAssets()) {
+					if (comparableAsset.getType() == Tile.TileType.PROPERTY
+							&& ((PropertyTile) comparableAsset).getGroupNumber() == group)
+						count++;
+				}
+				completionRates.put(asset, (double) count / setMaxCount);
+			} else if (asset.getType() == Tile.TileType.RAILROAD) {
+				int count = 0;
+				for (OwnableTile comparableAsset : client.getAssets()) {
+					if (comparableAsset.getType() == Tile.TileType.RAILROAD)
+						count++;
+				}
+				completionRates.put(asset, (double) count / 4.0);
+			} else if (asset.getType() == Tile.TileType.UTILITY) {
+				int count = 0;
+				for (OwnableTile comparableAsset : client.getAssets()) {
+					if (comparableAsset.getType() == Tile.TileType.UTILITY)
+						count++;
+				}
+				completionRates.put(asset, (double) count / 2.0);
 			}
-		} else if (tile.getType() == Tile.TileType.UTILITY) {
-			UtilityTile property = (UtilityTile) tile;
-
-			eval = property.getPropertyValue() + 200;
-
-			if (property.isMonopoly())
-				eval *= 2;
-		} else if (tile.getType() == Tile.TileType.RAILROAD) {
-			RailroadTile property = (RailroadTile) tile;
-
-			eval = property.getPropertyValue() + (int) (property.getRent() / 200.0 * 4) + 200;
 		}
 
-		return eval;
+		return completionRates;
 	}
 
-	/**
-	 * Sort the assets in an instance of a Player object by the worth of holding
-	 * onto the asset
-	 *
-	 * @param player The player whose assets are to be sorted
-	 */
-	public static void sortAssetsByWorth(Player player) {
-		ArrayList<OwnableTile> assets = player.getAssets();
-		if (assets.size() > 1) {
-			for (int i = 0; i < assets.size() - 1; i++) {
-				for (int j = i + 1; j < assets.size(); j++) {
-					if (getAssetWorth(assets.get(i)) > getAssetWorth(assets.get(j))) {
-						OwnableTile tmp = assets.get(i);
-						assets.set(i, assets.get(j));
-						assets.set(j, tmp);
-					}
+	public int valueToClient(OwnableTile asset) {
+		double value = 200;
+		double setCompletion;
+
+		{
+			HashMap<OwnableTile, Double> setCompletions = getSetCompletions();
+			if (setCompletions.keySet().contains(asset))
+				setCompletion = getSetCompletions().get(asset);
+			else
+				setCompletion = 0;
+		}
+
+		if (setCompletion == 1) {
+			value *= 2;
+		} else if (setCompletion >= 0.5) {
+			value *= 1 + setCompletion;
+		}
+
+		if (asset.getType() == Tile.TileType.PROPERTY) {
+			value *= 1.33;
+
+			if (setCompletion == 1) {
+				PropertyTile property = (PropertyTile) asset;
+				if (property.getHouses() > 0) {
+					value *= property.getHouses();
 				}
 			}
 		}
 
+		return (int) value + asset.getPropertyValue();
 	}
 
-	/**
-	 * Creates a "smart offer" for the sender, and allows negotiations to compromise
-	 * on a deal
-	 *
-	 * @param sender   The Player creating the offer
-	 * @param receiver The player receiving the offer
-	 */
-	public static void createOffer(Player sender, Player receiver) {
-		if (sender == receiver)
-			return;
+	public ArrayList<OwnableTile> mostWantedProperties(double completionThreshold) {
+		HashMap<OwnableTile, Double> completionRates = getSetCompletions();
+		ArrayList<OwnableTile> wanted = new ArrayList<>();
 
-		sortAssetsByWorth(sender);
+		for (OwnableTile asset : completionRates.keySet())
+			if (completionRates.get(asset) >= completionThreshold)
+				wanted.add(asset);
 
-		if (sender.getAssets().size() >= 2 && receiver.getAssets().size() >= 2) {
-			for (Tile t : receiver.getAssets()) {
-				if (getAssetWorthToOther(t, sender) >= getAssetWorth(sender.getAssets().get(0))) {
-					TradeOffer trade = new TradeOffer(sender, sender.getAssets().get(0), 0, receiver, t, 0);
-					trade.sendOffer();
-					if (trade.isFairTrade()) {
-						trade.execute();
-						break;
-					}
+		for (int i = 0; i < wanted.size() - 1; i++) {
+			for (int j = i + 1; j < wanted.size(); j++) {
+				if (valueToClient(wanted.get(i)) < valueToClient(wanted.get(j))) {
+					OwnableTile tmp = wanted.get(i);
+					wanted.set(i, wanted.get(j));
+					wanted.set(j, tmp);
+				}
+			}
+		}
+
+		return wanted;
+	}
+
+	public ArrayList<OwnableTile> mostWantedProperties() {
+		double completionThreshold = 0.5;
+		ArrayList<OwnableTile> wanted = mostWantedProperties(completionThreshold);
+
+		while (wanted.size() < 1 && completionThreshold >= 0) {
+			completionThreshold -= 0.1;
+			wanted = mostWantedProperties(completionThreshold);
+		}
+
+		return wanted;
+	}
+
+	public boolean hasAssetFromSet(int groupNumber) {
+		for (PropertyTile property : client.getProperties())
+			if (property.getGroupNumber() == groupNumber)
+				return true;
+		return false;
+	}
+
+	public boolean hasAssetFromSet(Tile.TileType tileType) {
+		if (tileType == Tile.TileType.RAILROAD) {
+			return client.getRailroads().size() > 0;
+		} else if (tileType == Tile.TileType.UTILITY) {
+			return client.getUtilities().size() > 0;
+		} else {
+			return false;
+		}
+	}
+
+	public PropertyTile getPrimaryAssetFromSet(int groupNumber) {
+		for (PropertyTile property : client.getProperties()) {
+			if (property.getGroupNumber() == groupNumber) {
+				return property;
+			}
+		}
+		return null;
+	}
+
+	public OwnableTile getPrimaryAssetFromSet(Tile.TileType tileType) {
+		if (tileType == Tile.TileType.RAILROAD)
+			return client.getRailroads().get(0);
+		else if (tileType == Tile.TileType.UTILITY)
+			return client.getUtilities().get(0);
+		else
+			return null;
+	}
+
+	public boolean buildBestTradeOffer(Player otherPlayer) {
+		TradeBroker otherBroker = new TradeBroker(otherPlayer);
+		OwnableTile mostWanted, otherMostWanted;
+		int wantedSet, otherWantedSet; // 1-8 = colored properties; 9 = railroad; 10 = utility
+		Tile.TileType wantedSetType, otherWantedSetType; // to avoid long lines later
+
+		{
+			ArrayList<OwnableTile> ranked = mostWantedProperties();
+			ArrayList<OwnableTile> otherRanked = otherBroker.mostWantedProperties();
+			mostWanted = ranked.size() > 0 ? mostWantedProperties().get(0) : null;
+			otherMostWanted = otherRanked.size() > 0 ? otherBroker.mostWantedProperties().get(0) : null;
+		}
+//		System.out.printf("!!! %s %s\n", mostWanted, otherMostWanted);
+
+		if (mostWanted == null || otherMostWanted == null)
+			return false;
+
+		if (mostWanted.getType() == Tile.TileType.PROPERTY)
+			wantedSet = ((PropertyTile) mostWanted).getGroupNumber();
+		else if (mostWanted.getType() == Tile.TileType.RAILROAD)
+			wantedSet = 9;
+		else if (mostWanted.getType() == Tile.TileType.UTILITY)
+			wantedSet = 10;
+		else
+			wantedSet = 0;
+
+		if (otherMostWanted.getType() == Tile.TileType.PROPERTY)
+			otherWantedSet = ((PropertyTile) otherMostWanted).getGroupNumber();
+		else if (otherMostWanted.getType() == Tile.TileType.RAILROAD)
+			otherWantedSet = 9;
+		else if (otherMostWanted.getType() == Tile.TileType.UTILITY)
+			otherWantedSet = 10;
+		else
+			otherWantedSet = 0;
+
+		if (wantedSet == 9)
+			wantedSetType = Tile.TileType.RAILROAD;
+		else if (wantedSet == 10)
+			wantedSetType = Tile.TileType.UTILITY;
+		else if (wantedSet >= 1 && wantedSet <= 8)
+			wantedSetType = Tile.TileType.PROPERTY;
+		else
+			wantedSetType = null;
+
+		if (otherWantedSet == 9)
+			otherWantedSetType = Tile.TileType.RAILROAD;
+		else if (otherWantedSet == 10)
+			otherWantedSetType = Tile.TileType.UTILITY;
+		else if (otherWantedSet >= 1 && otherWantedSet <= 8)
+			otherWantedSetType = Tile.TileType.PROPERTY;
+		else
+			otherWantedSetType = null;
+
+		if (wantedSet != otherWantedSet && wantedSet != 0 && otherWantedSet != 0) {
+//			System.out.printf("!!! %d %d\n", wantedSet, otherWantedSet);
+			OwnableTile wantedAsset = null;
+			OwnableTile otherWantedAsset = null;
+
+			if (otherWantedSet < 9 && hasAssetFromSet(otherWantedSet))
+				otherWantedAsset = getPrimaryAssetFromSet(otherWantedSet);
+			else if (hasAssetFromSet(otherWantedSetType))
+				otherWantedAsset = getPrimaryAssetFromSet(otherWantedSetType);
+
+			if (otherWantedAsset != null) {
+				if (wantedSet < 9 && otherBroker.hasAssetFromSet(wantedSet))
+					wantedAsset = otherBroker.getPrimaryAssetFromSet(wantedSet);
+				else if (otherBroker.hasAssetFromSet(wantedSetType))
+					wantedAsset = otherBroker.getPrimaryAssetFromSet(wantedSetType);
+
+			}
+
+			if (wantedAsset != null && otherWantedAsset != null) {
+				int wantedAssetValue = (valueToClient(wantedAsset) + otherBroker.valueToClient(wantedAsset)) / 2;
+				int otherWantedAssetValue = (valueToClient(otherWantedAsset)
+						+ otherBroker.valueToClient(otherWantedAsset)) / 2;
+				int cashOffer = wantedAssetValue - otherWantedAssetValue;
+				TradeOffer deal = new TradeOffer(client, otherPlayer, otherWantedAsset, wantedAsset, cashOffer);
+
+				// Check if the deal will bankrupt any players
+				if (cashOffer > 0) {
+					if (client.getBalance() - cashOffer < 300)
+						return false;
+				} else if (cashOffer < 0) {
+					if (otherPlayer.getBalance() + cashOffer < 300)
+						return false;
+				}
+
+				deal.execute();
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public void sortAssetsByWorth() {
+		for (int i = 0; i < client.getAssets().size() - 1; i++) {
+			for (int j = i + 1; j < client.getAssets().size(); j++) {
+				if (valueToClient(client.getAssets().get(i)) < valueToClient(client.getAssets().get(j))) {
+					OwnableTile tmp = client.getAssets().get(i);
+					client.getAssets().set(i, client.getAssets().get(j));
+					client.getAssets().set(j, tmp);
 				}
 			}
 		}

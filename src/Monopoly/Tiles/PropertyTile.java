@@ -252,6 +252,6 @@ public class PropertyTile extends OwnableTile {
      */
     public String toString() {
         String append = houses <= 4 && houses > 0 ? " (" + houses + " houses)" : (hasHotel() ? " (w/ Hotel)" : null);
-        return String.format("%s%s %s", NAME, append == null ? "" : append, isMortgaged() ? "(Mortgaged)" : "");
+        return String.format("[%d]%s%s %s", group, NAME, append == null ? "" : append, isMortgaged() ? "(Mortgaged)" : "");
     }
 }

@@ -170,13 +170,54 @@ public class Player {
 	}
 
 	/**
-	 * Remove an asset at a specified index
+	 * Removes an asset at a specified index
 	 *
 	 * @param index Index in the asset list to remove an asset from.
 	 */
 	public void removeAsset(int index) {
 		if (assets != null && index >= 0)
 			assets.remove(index);
+	}
+
+	/**
+	 * Get all "colored properties" from a player's list of asset
+	 * 
+	 * @return An ArrayList of PropertyTiles belonging to a player
+	 */
+	public ArrayList<PropertyTile> getProperties() {
+		ArrayList<PropertyTile> list = new ArrayList<>();
+
+		for (OwnableTile asset : assets) {
+			if (asset.getType() == Tile.TileType.PROPERTY) {
+				list.add((PropertyTile) asset);
+			}
+		}
+
+		return list;
+	}
+
+	public ArrayList<RailroadTile> getRailroads() {
+		ArrayList<RailroadTile> list = new ArrayList<>();
+
+		for (OwnableTile asset : assets) {
+			if (asset.getType() == Tile.TileType.RAILROAD) {
+				list.add((RailroadTile) asset);
+			}
+		}
+
+		return list;
+	}
+
+	public ArrayList<UtilityTile> getUtilities() {
+		ArrayList<UtilityTile> list = new ArrayList<>();
+
+		for (OwnableTile asset : assets) {
+			if (asset.getType() == Tile.TileType.UTILITY) {
+				list.add((UtilityTile) asset);
+			}
+		}
+
+		return list;
 	}
 
 	/**
@@ -187,6 +228,7 @@ public class Player {
 		if (isBankrupt())
 			return;
 
+		TradeBroker broker = new TradeBroker(this);
 		int[] roll = Dice.roll2();
 		int moveAmount = roll[0] + roll[1];
 
@@ -264,10 +306,10 @@ public class Player {
 
 		if (!isBankrupt())
 			for (Player p : game.getPlayers())
-				if (!p.isBankrupt())
-					TradeBroker.createOffer(this, p);
+				while (broker.buildBestTradeOffer(p))
+					;
 
-		TradeBroker.sortAssetsByWorth(this);
+		broker.sortAssetsByWorth();
 
 		for (OwnableTile asset : assets) {
 			if (asset.getType() == Tile.TileType.PROPERTY) {
@@ -285,7 +327,8 @@ public class Player {
 		}
 
 		// If player can, un-mortgage properties, then do all this:
-		TradeBroker.sortAssetsByWorth(this);
+		broker.sortAssetsByWorth();
+
 		for (int i = assets.size() - 1; i >= 0; i--) {
 			// If un-mortgage amount is less than a quarter of balance
 			if ((assets.get(i).getPropertyValue() / 2) * 1.1 < 0.25 * balance) {
@@ -360,8 +403,10 @@ public class Player {
 	}
 
 	private void escapeBankruptcy(int amount) {
+		TradeBroker broker = new TradeBroker(this);
+
 		if (balance < amount) {
-			TradeBroker.sortAssetsByWorth(this);
+			broker.sortAssetsByWorth();
 
 			for (int i = 0; i < assets.size(); i++)
 				if (assets.get(i).isMonopoly() && !assets.get(i).isMortgaged()
@@ -369,14 +414,14 @@ public class Player {
 					assets.get(i).mortgage();
 		}
 
-		TradeBroker.sortAssetsByWorth(this);
+		broker.sortAssetsByWorth();
 		for (int i = 0; i < assets.size() && balance < amount; i++)
 			if (assets.get(i).isMonopoly() && assets.get(i).getType() == Tile.TileType.PROPERTY)
 				while (balance < amount && ((PropertyTile) assets.get(i)).getHousesInMonopolySet() > 0)
 					((PropertyTile) assets.get(i)).autoSellHouseOnMonopoly();
 
 		if (balance < amount) {
-			TradeBroker.sortAssetsByWorth(this);
+			broker.sortAssetsByWorth();
 
 			for (int i = 0; i < assets.size() && balance < amount; i++)
 				if (!assets.get(i).isMortgaged())
@@ -445,21 +490,6 @@ public class Player {
 	 */
 	public boolean isBankrupt() {
 		return balance < 0;
-	}
-
-	/**
-	 * Gets a players personal evaluation of all their assets and cash
-	 *
-	 * @return The evaluation of a Player's assets and cash
-	 */
-	public int getPersonalEvaluation() {
-		int eval = 0;
-		for (Tile t : assets)
-			eval += TradeBroker.getAssetWorth(t);
-
-		eval += getOutOfJailCards * 50 + balance;
-
-		return eval;
 	}
 
 	/**
