@@ -366,10 +366,13 @@ public class Player {
 	}
 
 	/**
-	 * Liquidates assets until the player's balance is at least the amount
-	 * specified. Liquidation occurs in the order of: 1. Non-properties and
-	 * non-monopoly sets (least valuable first) 2. Non-monopoly sets (least valuable
-	 * first) 3. All properties (least valuable first)
+	 * Sell assets until the player's balance is at least the amount specified.
+	 * Liquidation occurs in the order of:
+	 * <ol>
+	 * <li>1. Non-properties and non-monopoly sets (least valuable first)</li>
+	 * <li>2. Non-monopoly sets (least valuable first)</li>
+	 * <li>3. All properties (least valuable first)</li>
+	 * </ol>
 	 * 
 	 * @param amount The expected balance after liquidation occurs
 	 */
