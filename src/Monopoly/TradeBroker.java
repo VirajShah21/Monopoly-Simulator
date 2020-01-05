@@ -5,16 +5,28 @@ import java.util.*;
 import Monopoly.Tiles.*;
 
 /**
- * The TradeBroker class, when implemented, allows for automated players to
- * create trade offers, accept offers, deny offers, etc
+ * Builds win-win trades for any two players. The TradeBroker class associates
+ * with a Player object, which is the client. The broker will only build trades
+ * if it will benefit the client Player.
  */
 public class TradeBroker {
+	/**
+	 * The Player object which the TradeBroker primarily represents
+	 */
 	private Player client;
 
+	/**
+	 * Contstruct a TradeBroker object
+	 * 
+	 * @param client The client Player
+	 */
 	public TradeBroker(Player client) {
 		this.client = client;
 	}
 
+	/**
+	 * @return A HashMap of how complete each monopoly set is
+	 */
 	private HashMap<OwnableTile, Double> getSetCompletions() {
 		HashMap<OwnableTile, Double> completionRates = new HashMap<>();
 
@@ -49,6 +61,13 @@ public class TradeBroker {
 		return completionRates;
 	}
 
+	/**
+	 * Describes the value of an asset to a client
+	 * 
+	 * @param asset An OwnableTile (Property, Railroad, or Utility) to be evaluated
+	 *              by the TradeBroker
+	 * @return The value of a property to the client
+	 */
 	public int valueToClient(OwnableTile asset) {
 		double value = 200;
 		double setCompletion;
@@ -81,6 +100,14 @@ public class TradeBroker {
 		return (int) value + asset.getPropertyValue();
 	}
 
+	/**
+	 * Build a list of the most wanted properties from a clients list of assets
+	 * 
+	 * @param completionThreshold How complete an asset should be to be added to the
+	 *                            list of wanted assets
+	 * @return An ArrayList of OwnableTiles which describe the most wanted
+	 *         properties by the client
+	 */
 	public ArrayList<OwnableTile> mostWantedProperties(double completionThreshold) {
 		HashMap<OwnableTile, Double> completionRates = getSetCompletions();
 		ArrayList<OwnableTile> wanted = new ArrayList<>();
@@ -102,6 +129,12 @@ public class TradeBroker {
 		return wanted;
 	}
 
+	/**
+	 * Calls mostWantedProperties(0.5) w/ completion threshold of 0.5 (deducted by
+	 * 0.1 until the returned ArrayList has at least one item).
+	 * 
+	 * @return An ArrayList of the most wanted properties
+	 */
 	public ArrayList<OwnableTile> mostWantedProperties() {
 		double completionThreshold = 0.5;
 		ArrayList<OwnableTile> wanted = mostWantedProperties(completionThreshold);
@@ -114,6 +147,14 @@ public class TradeBroker {
 		return wanted;
 	}
 
+	/**
+	 * Check if the client has a PropertyTile with the specified group number
+	 * 
+	 * @param groupNumber The group number (representative of color group) to search
+	 *                    for
+	 * @return True if client has PropertyTile with the specified group number;
+	 *         false otherwise
+	 */
 	public boolean hasAssetFromSet(int groupNumber) {
 		for (PropertyTile property : client.getProperties())
 			if (property.getGroupNumber() == groupNumber)
@@ -121,6 +162,12 @@ public class TradeBroker {
 		return false;
 	}
 
+	/**
+	 * Check if the client has an OwnableTile (either Railroad or Utility)
+	 * 
+	 * @param tileType The TileType to check for
+	 * @return True if client has the specified type of tile; false otherwise
+	 */
 	public boolean hasAssetFromSet(Tile.TileType tileType) {
 		if (tileType == Tile.TileType.RAILROAD) {
 			return client.getRailroads().size() > 0;
@@ -131,6 +178,13 @@ public class TradeBroker {
 		}
 	}
 
+	/**
+	 * Get a PropertyTile from the client with the specified group number
+	 * 
+	 * @param groupNumber The filter for group
+	 * @return A single PropertyTile from the specified group number from the
+	 *         clients list of assets
+	 */
 	public PropertyTile getPrimaryAssetFromSet(int groupNumber) {
 		for (PropertyTile property : client.getProperties()) {
 			if (property.getGroupNumber() == groupNumber) {
@@ -140,6 +194,13 @@ public class TradeBroker {
 		return null;
 	}
 
+	/**
+	 * Get an OwnableTile (Railroad or Utility) from the client with a specified
+	 * TileType
+	 * 
+	 * @param tileType The filter for the property type
+	 * @return An OwnableTile (Railroad or Utility) from the client
+	 */
 	public OwnableTile getPrimaryAssetFromSet(Tile.TileType tileType) {
 		if (tileType == Tile.TileType.RAILROAD)
 			return client.getRailroads().get(0);
@@ -149,6 +210,14 @@ public class TradeBroker {
 			return null;
 	}
 
+	/**
+	 * Builds the best possible trade for the client (and for another specified
+	 * player
+	 * 
+	 * @param otherPlayer The other player to broker a deal with
+	 * @return True if a good (and fair) deal was made and executed; false if no
+	 *         deal was made.
+	 */
 	public boolean buildBestTradeOffer(Player otherPlayer) {
 		TradeBroker otherBroker = new TradeBroker(otherPlayer);
 		OwnableTile mostWanted, otherMostWanted;
@@ -161,7 +230,6 @@ public class TradeBroker {
 			mostWanted = ranked.size() > 0 ? mostWantedProperties().get(0) : null;
 			otherMostWanted = otherRanked.size() > 0 ? otherBroker.mostWantedProperties().get(0) : null;
 		}
-//		System.out.printf("!!! %s %s\n", mostWanted, otherMostWanted);
 
 		if (mostWanted == null || otherMostWanted == null)
 			return false;
@@ -203,7 +271,6 @@ public class TradeBroker {
 			otherWantedSetType = null;
 
 		if (wantedSet != otherWantedSet && wantedSet != 0 && otherWantedSet != 0) {
-//			System.out.printf("!!! %d %d\n", wantedSet, otherWantedSet);
 			OwnableTile wantedAsset = null;
 			OwnableTile otherWantedAsset = null;
 
@@ -243,6 +310,9 @@ public class TradeBroker {
 		return false;
 	}
 
+	/**
+	 * Organize the clients assets by value (most valuable to least valuable)
+	 */
 	public void sortAssetsByWorth() {
 		for (int i = 0; i < client.getAssets().size() - 1; i++) {
 			for (int j = i + 1; j < client.getAssets().size(); j++) {

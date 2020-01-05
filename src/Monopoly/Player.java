@@ -179,7 +179,7 @@ public class Player {
 	}
 
 	/**
-	 * Get all "colored properties" from a player's list of asset
+	 * Get all "colored properties" from the player's list of assets
 	 * 
 	 * @return An ArrayList of PropertyTiles belonging to a player
 	 */
@@ -195,6 +195,11 @@ public class Player {
 		return list;
 	}
 
+	/**
+	 * Get all railroads from the player's list of assets
+	 * 
+	 * @return An ArrayList of RailroadTiles belonging to a player
+	 */
 	public ArrayList<RailroadTile> getRailroads() {
 		ArrayList<RailroadTile> list = new ArrayList<>();
 
@@ -207,6 +212,11 @@ public class Player {
 		return list;
 	}
 
+	/**
+	 * Get all utilities from the player's list of assets
+	 * 
+	 * @return An ArrayList of UtilityTiles belonging to a player
+	 */
 	public ArrayList<UtilityTile> getUtilities() {
 		ArrayList<UtilityTile> list = new ArrayList<>();
 
@@ -340,6 +350,9 @@ public class Player {
 		}
 	}
 
+	/**
+	 * @return Get the total number of houses belonging to the player
+	 */
 	public int getNumberOfHouses() {
 		int total = 0;
 
@@ -352,6 +365,14 @@ public class Player {
 		return total;
 	}
 
+	/**
+	 * Liquidates assets until the player's balance is at least the amount
+	 * specified. Liquidation occurs in the order of: 1. Non-properties and
+	 * non-monopoly sets (least valuable first) 2. Non-monopoly sets (least valuable
+	 * first) 3. All properties (least valuable first)
+	 * 
+	 * @param amount The expected balance after liquidation occurs
+	 */
 	private void liquidate(int amount) {
 		TradeBroker broker = new TradeBroker(this);
 
@@ -394,8 +415,7 @@ public class Player {
 					break;
 			}
 		}
-		
-		
+
 	}
 
 	/**
