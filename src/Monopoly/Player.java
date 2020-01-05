@@ -7,6 +7,7 @@ import Monopoly.Tiles.OwnableTile;
 import Monopoly.Tiles.PropertyTile;
 import Monopoly.Tiles.RailroadTile;
 import Monopoly.Tiles.Tile;
+import Monopoly.Tiles.Tile.TileType;
 import Monopoly.Tiles.UtilityTile;
 
 import java.util.ArrayList;
@@ -187,7 +188,7 @@ public class Player {
 		ArrayList<PropertyTile> list = new ArrayList<>();
 
 		for (OwnableTile asset : assets) {
-			if (asset.getType() == Tile.TileType.PROPERTY) {
+			if (asset.getType() == TileType.PROPERTY) {
 				list.add((PropertyTile) asset);
 			}
 		}
@@ -221,7 +222,7 @@ public class Player {
 		ArrayList<UtilityTile> list = new ArrayList<>();
 
 		for (OwnableTile asset : assets) {
-			if (asset.getType() == Tile.TileType.UTILITY) {
+			if (asset.getType() == TileType.UTILITY) {
 				list.add((UtilityTile) asset);
 			}
 		}
@@ -272,37 +273,65 @@ public class Player {
 		Logger.log(String.format("%s moved to %s", this, game.tileAt(position)));
 
 		Tile currTile = game.tileAt(position);
-		if (currTile.getType() == Tile.TileType.PROPERTY || currTile.getType() == Tile.TileType.RAILROAD
-				|| currTile.getType() == Tile.TileType.UTILITY) {
+		if (currTile.getType() == TileType.PROPERTY || currTile.getType() == TileType.RAILROAD
+				|| currTile.getType() == TileType.UTILITY) {
 			OwnableTile tile = (OwnableTile) currTile;
 
 			if (!tile.isOwned()) {
 				tile.buy(this);
 				Logger.log(new LandingLog(this.name, position, 0));
-			} else if (((OwnableTile) currTile).getOwner() != this) {
+			} else if (tile.getOwner() != this) {
 				game.payRent(this, tile, moveAmount);
-				Logger.log(new LandingLog(name, position, ((OwnableTile) currTile).getRent()));
+				Logger.log(new LandingLog(name, position, tile.getRent()));
 			} else {
 				Logger.log(new LandingLog(name, position, 0));
 			}
-		} else if (currTile.getType() == Tile.TileType.CHANCE) {
+		} else if (currTile.getType() == TileType.CHANCE) {
 			Card chanceCard = Card.pickRandomCard(Card.chanceDeck);
 			chanceCard.pickup(this);
 			Logger.log(new LandingLog(name, position, 0));
-		} else if (currTile.getType() == Tile.TileType.COMMUNITY_CHEST) {
+
+			if (currTile.getType() == TileType.PROPERTY || currTile.getType() == TileType.RAILROAD
+					|| currTile.getType() == TileType.UTILITY) {
+				OwnableTile tile = (OwnableTile) currTile;
+				if (!tile.isOwned()) {
+					tile.buy(this);
+					Logger.log(new LandingLog(name, position, 0));
+				} else if (tile.getOwner() != this) {
+					game.payRent(this, tile, moveAmount);
+					Logger.log(new LandingLog(name, position, tile.getRent()));
+				} else {
+					Logger.log(new LandingLog(name, position, 0));
+				}
+			}
+		} else if (currTile.getType() == TileType.COMMUNITY_CHEST) {
 			Card ccCard = Card.pickRandomCard(Card.communityChestDeck);
 			ccCard.pickup(this);
 			Logger.log(new LandingLog(name, position, 0));
-		} else if (currTile.getType() == Tile.TileType.GO_TO_JAIL) {
+
+			if (currTile.getType() == TileType.PROPERTY || currTile.getType() == TileType.RAILROAD
+					|| currTile.getType() == TileType.UTILITY) {
+				OwnableTile tile = (OwnableTile) currTile;
+				if (!tile.isOwned()) {
+					tile.buy(this);
+					Logger.log(new LandingLog(name, position, 0));
+				} else if (tile.getOwner() != this) {
+					game.payRent(this, tile, moveAmount);
+					Logger.log(new LandingLog(name, position, tile.getRent()));
+				} else {
+					Logger.log(new LandingLog(name, position, 0));
+				}
+			}
+		} else if (currTile.getType() == TileType.GO_TO_JAIL) {
 			setPosition(10);
 			goToJail();
 			Logger.log(new LandingLog(name, position, 0));
-		} else if (currTile.getType() == Tile.TileType.FREE_PARKING) {
+		} else if (currTile.getType() == TileType.FREE_PARKING) {
 			int poolSize = ((FreeParkingTile) currTile).getPoolAmount();
 			this.addBalance(poolSize);
 			((FreeParkingTile) currTile).clearPool();
 			Logger.log(new LandingLog(name, position, 0));
-		} else if (currTile.getType() == Tile.TileType.TAX) {
+		} else if (currTile.getType() == TileType.TAX) {
 			if (position == 4) {
 				deductBalance(200);
 				((FreeParkingTile) game.tileAt(20)).addToPool(200);
@@ -321,7 +350,7 @@ public class Player {
 		broker.sortAssetsByWorth();
 
 		for (OwnableTile asset : assets) {
-			if (asset.getType() == Tile.TileType.PROPERTY) {
+			if (asset.getType() == TileType.PROPERTY) {
 				PropertyTile property = (PropertyTile) asset;
 
 				while (property.getHousePrice() < 0.25 * balance && !property.hasHotel() && property.allowedToBuild()) {
@@ -357,7 +386,7 @@ public class Player {
 		int total = 0;
 
 		for (OwnableTile a : assets) {
-			if (a.getType() == Tile.TileType.PROPERTY) {
+			if (a.getType() == TileType.PROPERTY) {
 				total += ((PropertyTile) a).getHouses();
 			}
 		}
@@ -384,7 +413,7 @@ public class Player {
 		if (amount > balance) {
 			for (int i = assets.size() - 1; i >= 0 && amount > balance; i--) {
 				if (!assets.get(i).isMonopoly() && !assets.get(i).isMortgaged()
-						&& assets.get(i).getType() != Tile.TileType.PROPERTY) {
+						&& assets.get(i).getType() != TileType.PROPERTY) {
 					assets.get(i).mortgage();
 				}
 
