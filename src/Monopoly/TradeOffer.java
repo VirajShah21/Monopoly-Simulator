@@ -35,14 +35,13 @@ public class TradeOffer {
 	/**
 	 * Constructs a TradeOffer object
 	 *
-	 * @param sender        The Player initializing the offer
-	 * @param senderTile    The sender's tile up for trade
-	 * @param senderStake   The sender's cash stake in the offer
-	 * @param receiver      The receiving player
-	 * @param receiverTile  The receiving player's tile being requested by the
-	 *                      sender
-	 * @param receiverStake The receiving player's cash stake being request by the
-	 *                      sender
+	 * @param sender       The Player initializing the offer
+	 * @param receiver     The receiving player
+	 * @param senderTile   The sender's tile up for trade
+	 * @param receiverTile The receiving player's tile being requested by the sender
+	 * @param cashOffer    The amount of money the sender is willing to pay for the
+	 *                     trade. If the value is negative, then the "sender" would
+	 *                     receive the cash amount.
 	 */
 	public TradeOffer(Player sender, Player receiver, Tile senderTile, Tile receiverTile, int cashOffer) {
 		this.sender = sender;

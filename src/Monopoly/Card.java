@@ -134,7 +134,6 @@ public class Card {
                     int houseAmount = Integer.parseInt(words[2]);
                     int hotelAmount = Integer.parseInt(words[3]);
                     int totalFee = 0;
-                    ArrayList<OwnableTile> playerAssets = player.getAssets();
                     for (OwnableTile asset : player.getAssets()) {
                         if (asset.getType() == Tile.TileType.PROPERTY) {
                             PropertyTile property = (PropertyTile) asset;

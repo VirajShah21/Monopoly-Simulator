@@ -16,7 +16,7 @@ public class TradeBroker {
 	private Player client;
 
 	/**
-	 * Contstruct a TradeBroker object
+	 * Construct a TradeBroker object
 	 * 
 	 * @param client The client Player
 	 */

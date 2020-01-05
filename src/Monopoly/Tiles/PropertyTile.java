@@ -164,7 +164,8 @@ public class PropertyTile extends OwnableTile {
     }
 
     /**
-     * Purchases a house; automatically deducts balance from purchasing player and increments hosue counter
+     * Purchases a house; automatically deducts balance from purchasing player and increments house counter
+     * @return True if owner is allowed to develop on this property and property is successfully bought; false otherwise
      */
     public boolean buyHouse() {
         if (allowedToBuild()) {

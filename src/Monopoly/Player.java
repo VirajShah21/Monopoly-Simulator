@@ -424,8 +424,9 @@ public class Player {
 	/**
 	 * Deduct balance from user. If they do not have enough money, then player will
 	 * mortgage properties.
-	 *
+	 * 
 	 * @param amount The amount to be deducted from the player's balance
+	 * @return The amount of money deducted from the player's balance
 	 */
 	public int deductBalance(int amount) {
 		if (amount > balance) {
@@ -449,6 +450,7 @@ public class Player {
 	 * Add a balance to the players holdings.
 	 *
 	 * @param amount The amount to be added to the player's balance
+	 * @return The amount of money added to the player's balance
 	 */
 	public int addBalance(int amount) {
 		ArrayList<Player> players = getGame().getPlayers();
