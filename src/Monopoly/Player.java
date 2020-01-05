@@ -386,7 +386,7 @@ public class Player {
 
 		if (amount > balance) {
 			for (int i = assets.size() - 1; i >= 0 && amount > balance; i--) {
-				if (!assets.get(i).isMonopoly() && !assets.get(i).isMortgaged()) {
+				if (!assets.get(i).isMortgaged()) {
 					assets.get(i).mortgage();
 				}
 
@@ -394,6 +394,8 @@ public class Player {
 					break;
 			}
 		}
+		
+		
 	}
 
 	/**
