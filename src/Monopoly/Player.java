@@ -405,27 +405,44 @@ public class Player {
 	private void escapeBankruptcy(int amount) {
 		TradeBroker broker = new TradeBroker(this);
 
-		if (balance < amount) {
-			broker.sortAssetsByWorth();
-
-			for (int i = 0; i < assets.size(); i++)
-				if (assets.get(i).isMonopoly() && !assets.get(i).isMortgaged()
-						&& assets.get(i).getType() != Tile.TileType.PROPERTY)
+		broker.sortAssetsByWorth();
+		
+		while (balance < amount) {
+			for (int i = assets.size() - 1; i >= 0; i--) {
+				if (!assets.get(i).isMonopoly() && !assets.get(i).isMortgaged()
+						&& assets.get(i).getType() != Tile.TileType.PROPERTY) {
 					assets.get(i).mortgage();
+				}
+
+				if (i == 0)
+					break;
+			}
 		}
 
 		broker.sortAssetsByWorth();
-		for (int i = 0; i < assets.size() && balance < amount; i++)
-			if (assets.get(i).isMonopoly() && assets.get(i).getType() == Tile.TileType.PROPERTY)
-				while (balance < amount && ((PropertyTile) assets.get(i)).getHousesInMonopolySet() > 0)
-					((PropertyTile) assets.get(i)).autoSellHouseOnMonopoly();
 
-		if (balance < amount) {
-			broker.sortAssetsByWorth();
-
-			for (int i = 0; i < assets.size() && balance < amount; i++)
-				if (!assets.get(i).isMortgaged())
+		while (balance < amount) {
+			for (int i = assets.size() - 1; i >= 0; i--) {
+				if (!assets.get(i).isMonopoly() && !assets.get(i).isMortgaged()) {
 					assets.get(i).mortgage();
+				}
+
+				if (i == 0)
+					break;
+			}
+		}
+		
+		broker.sortAssetsByWorth();
+
+		while (balance < amount) {
+			for (int i = assets.size() - 1; i >= 0; i--) {
+				if (!assets.get(i).isMonopoly() && !assets.get(i).isMortgaged()) {
+					assets.get(i).mortgage();
+				}
+
+				if (i == 0)
+					break;
+			}
 		}
 	}
 
@@ -474,8 +491,9 @@ public class Player {
 			Logger.log(String.format("\t%s paid %s $%d in full", this, other, amount));
 		} else {
 			other.addBalance(amount - unpaidBalances);
-			other.assets.addAll(this.assets);
-			this.assets.clear();
+			for (int i = 0; i < assets.size(); i++)
+				assets.get(i).transferOwnership(other);
+			
 			Logger.log(String.format("\t%s bankrupted %s; %s recieved $%d and all %s's assets", other, this, other,
 					amount - unpaidBalances, this));
 		}
