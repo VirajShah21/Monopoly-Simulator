@@ -18,7 +18,6 @@ import java.util.ArrayList;
  * on the board.
  */
 
-@SuppressWarnings("unused")
 public class Player {
 	/**
 	 * The name of this player
@@ -341,56 +340,7 @@ public class Player {
 		}
 	}
 
-	/**
-	 * Find the least desired asset in an asset list. Used when selling properties.
-	 *
-	 * @return The least desired asset belonging to the player.
-	 */
-	private Tile leastDesiredAsset() {
-		int[] rankings = new int[assets.size()];
-		int lowestIndex;
-
-		for (int i = 0; i < rankings.length; i++) {
-			Tile asset = assets.get(i);
-
-			if (asset.getType() == Tile.TileType.UTILITY) {
-				rankings[i] = 7;
-				if (((UtilityTile) asset).isMonopoly())
-					rankings[i] -= 2;
-
-			} else if (asset.getType() == Tile.TileType.PROPERTY) {
-				rankings[i] = 5;
-				if (((PropertyTile) asset).isMonopoly()) {
-					rankings[i] -= 2;
-
-					if (((PropertyTile) asset).hasHotel())
-						rankings[i] -= 3;
-					else if (((PropertyTile) asset).getHouses() > 2)
-						rankings[i] -= 2;
-					else if (((PropertyTile) asset).getHouses() > 0) {
-						rankings[i] -= 1;
-					}
-				}
-
-			} else if (asset.getType() == Tile.TileType.RAILROAD) {
-				rankings[i] = 5;
-				rankings[i] -= ((RailroadTile) asset).railroadsInSet();
-			}
-		}
-
-		lowestIndex = 0;
-		for (int i = 0; i < rankings.length; i++)
-			if (rankings[i] < lowestIndex)
-				lowestIndex = i;
-
-		try {
-			return assets.get(lowestIndex);
-		} catch (IndexOutOfBoundsException e) {
-			return null;
-		}
-	}
-
-	public int getTotalNumberOfHouses() {
+	public int getNumberOfHouses() {
 		int total = 0;
 
 		for (OwnableTile a : assets) {
@@ -402,13 +352,13 @@ public class Player {
 		return total;
 	}
 
-	private void escapeBankruptcy(int amount) {
+	private void liquidate(int amount) {
 		TradeBroker broker = new TradeBroker(this);
 
 		broker.sortAssetsByWorth();
-		
-		while (balance < amount) {
-			for (int i = assets.size() - 1; i >= 0; i--) {
+
+		if (amount > balance) {
+			for (int i = assets.size() - 1; i >= 0 && amount > balance; i--) {
 				if (!assets.get(i).isMonopoly() && !assets.get(i).isMortgaged()
 						&& assets.get(i).getType() != Tile.TileType.PROPERTY) {
 					assets.get(i).mortgage();
@@ -421,8 +371,8 @@ public class Player {
 
 		broker.sortAssetsByWorth();
 
-		while (balance < amount) {
-			for (int i = assets.size() - 1; i >= 0; i--) {
+		if (amount > balance) {
+			for (int i = assets.size() - 1; i >= 0 && amount > balance; i--) {
 				if (!assets.get(i).isMonopoly() && !assets.get(i).isMortgaged()) {
 					assets.get(i).mortgage();
 				}
@@ -431,11 +381,11 @@ public class Player {
 					break;
 			}
 		}
-		
+
 		broker.sortAssetsByWorth();
 
-		while (balance < amount) {
-			for (int i = assets.size() - 1; i >= 0; i--) {
+		if (amount > balance) {
+			for (int i = assets.size() - 1; i >= 0 && amount > balance; i--) {
 				if (!assets.get(i).isMonopoly() && !assets.get(i).isMortgaged()) {
 					assets.get(i).mortgage();
 				}
@@ -452,17 +402,21 @@ public class Player {
 	 *
 	 * @param amount The amount to be deducted from the player's balance
 	 */
-	public boolean deductBalance(int amount) {
+	public int deductBalance(int amount) {
 		if (amount > balance) {
-			escapeBankruptcy(amount);
-			unpaidBalances = amount - balance;
+			Logger.log(String.format("Cannot deduct $%d from %s. Begining liquidation.", amount, this));
+			liquidate(amount);
+		}
+		int lastBalance = balance;
+
+		if (amount > balance) {
+			Logger.log(String.format("Liquidation only yielded only $%d. %s is now bankrupt.", balance, this));
 			balance = -1;
-			Logger.log(String.format("Unable to deduct $%d from %s; player is now bankrupt with $%d in unpaid balance",
-					amount, this, unpaidBalances));
-			return false;
+			return lastBalance;
 		} else {
 			balance -= amount;
-			return true;
+			Logger.log(String.format("Deducted $%d from %s", amount, this));
+			return amount;
 		}
 	}
 
@@ -471,29 +425,38 @@ public class Player {
 	 *
 	 * @param amount The amount to be added to the player's balance
 	 */
-	public void addBalance(int amount) {
-		balance += amount;
+	public int addBalance(int amount) {
+		ArrayList<Player> players = getGame().getPlayers();
+		int circulation = 0;
+		for (Player p : players)
+			circulation += p.getBalance();
+		if (20580 - circulation - amount >= 0) {
+			balance += amount;
+			return amount;
+		} else {
+			balance += 20580 - circulation;
+			return amount;
+		}
 	}
 
 	/**
 	 * Pays money from one player to another.
 	 *
-	 * @param other  The player to recieve money from this player.
+	 * @param other  The player to receive money from this player.
 	 * @param amount The amount of money to transfer.
 	 */
 	public void payTo(Player other, int amount) {
 		Logger.log(String.format("A transfer of $%d from %s to %s has been opened", amount, this, other));
 
-		boolean paidInFull = deductBalance(amount);
+		int amountDeducted = deductBalance(amount);
 
-		if (paidInFull) {
+		if (amountDeducted == amount) {
 			other.addBalance(amount);
 			Logger.log(String.format("\t%s paid %s $%d in full", this, other, amount));
 		} else {
-			other.addBalance(amount - unpaidBalances);
+			other.addBalance(amountDeducted);
 			for (int i = 0; i < assets.size(); i++)
 				assets.get(i).transferOwnership(other);
-			
 			Logger.log(String.format("\t%s bankrupted %s; %s recieved $%d and all %s's assets", other, this, other,
 					amount - unpaidBalances, this));
 		}
