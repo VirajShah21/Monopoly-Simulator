@@ -19,8 +19,14 @@ public abstract class OwnableTile extends Tile {
 	 */
 	protected Player owner;
 
+	/**
+	 * True if the asset is mortgaged
+	 */
 	protected boolean mortgaged;
-
+	
+	/**
+	 * The price of the property
+	 */
 	protected int propertyValue;
 
 	/**

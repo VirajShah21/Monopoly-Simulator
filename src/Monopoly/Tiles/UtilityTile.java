@@ -19,7 +19,10 @@ public class UtilityTile extends OwnableTile {
 	UtilityTile(String name) {
 		super(TileType.UTILITY, name, 150);
 	}
-
+	
+	/**
+	 * Returns all Utility Tiles owned by the owner of this Utility
+	 */
 	public ArrayList<UtilityTile> getMonopolySet() {
 		if (!isMonopoly())
 			return null;
@@ -32,9 +35,13 @@ public class UtilityTile extends OwnableTile {
 
 		return utilSet;
 	}
-
+	
+	/**
+	 * Mortgages the utility tile
+	 */
 	public void mortgage() {
-
+		owner.addBalance(propertyValue / 2);
+		mortgaged = true;
 	}
 
 	/**

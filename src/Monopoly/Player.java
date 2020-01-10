@@ -63,6 +63,9 @@ public class Player {
 	 */
 	private boolean inJail;
 
+	/**
+	 * The amount of money unable to deduct from player's balance
+	 */
 	private int unpaidBalances;
 
 	/**

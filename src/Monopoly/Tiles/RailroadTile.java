@@ -18,11 +18,17 @@ public class RailroadTile extends OwnableTile {
 		super(TileType.RAILROAD, name, 200);
 	}
 
+	/**
+	 * Mortgages the railroad
+	 */
 	public void mortgage() {
 		owner.addBalance(propertyValue / 2);
 		mortgaged = true;
 	}
 
+	/**
+	 * Returns all railroads which belongs to the owner of this railroad
+	 */
 	public ArrayList<RailroadTile> getMonopolySet() {
 		if (!isMonopoly())
 			return null;
