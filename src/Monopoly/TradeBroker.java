@@ -5,10 +5,11 @@ import java.util.*;
 import Monopoly.Tiles.*;
 
 /**
- * @author Viraj Shah
  * Builds win-win trades for any two players. The TradeBroker class associates
  * with a Player object, which is the client. The broker will only build trades
  * if it will benefit the client Player.
+ * 
+ * @author Viraj Shah
  */
 public class TradeBroker {
 	/**

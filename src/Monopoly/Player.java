@@ -13,11 +13,12 @@ import Monopoly.Tiles.UtilityTile;
 import java.util.ArrayList;
 
 /**
- * @author Viraj Shah
  * A monopoly Player class which provides features for managing a players
  * balance, smartly evading bankruptcy, managing properties/assets, using get
  * out of jail free cards, tracking their turns in jail, knowing their position
  * on the board.
+ * 
+ * @author Viraj Shah
  */
 
 public class Player {

@@ -5,6 +5,13 @@ import Monopoly.LoggerTools.Logger;
 
 import java.util.ArrayList;
 
+/**
+ * An extension of the Tile class, which has fields and methods for colored
+ * sets, railroads, and utilities
+ * 
+ * @author Viraj Shah
+ *
+ */
 public abstract class OwnableTile extends Tile {
 
 	/**

@@ -6,6 +6,11 @@ import Monopoly.Tiles.RailroadTile;
 import Monopoly.Tiles.Tile;
 import Monopoly.Tiles.UtilityTile;
 
+/**
+ * A POJO which stores transaction information for a trade
+ * 
+ * @author viraj
+ */
 public class TradeOffer {
 	/**
 	 * The Player initializing the offer

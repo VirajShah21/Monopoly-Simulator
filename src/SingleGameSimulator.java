@@ -2,6 +2,12 @@ import Monopoly.LoggerTools.Logger;
 import Monopoly.MonopolyGame;
 import Monopoly.Player;
 
+/**
+ * A simulator to simulate one game of monopoly with logs
+ * 
+ * @author Viraj Shah
+ *
+ */
 public class SingleGameSimulator {
 	public static void main(String[] args) {
 		Logger.printLogsWhenCreated = true;

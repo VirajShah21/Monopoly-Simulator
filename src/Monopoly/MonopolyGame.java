@@ -8,9 +8,10 @@ import Monopoly.Tiles.UtilityTile;
 import java.util.ArrayList;
 
 /**
- * @author Viraj Shah
  * The MonopolyGame class is responsible for handling all functions of an
  * instance of a Monopoly game.
+ * 
+ * @author Viraj Shah
  */
 public class MonopolyGame {
 	/**
