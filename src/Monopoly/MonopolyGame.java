@@ -8,6 +8,7 @@ import Monopoly.Tiles.UtilityTile;
 import java.util.ArrayList;
 
 /**
+ * @author Viraj Shah
  * The MonopolyGame class is responsible for handling all functions of an
  * instance of a Monopoly game.
  */
@@ -94,6 +95,32 @@ public class MonopolyGame {
 		if (turnsPlayed < maxTurnsAllowed) {
 			players.get(currentPlayer).playTurn();
 		}
+	}
+
+	/**
+	 * Returns the percentage chance of a player winning, based on their assets and
+	 * balance
+	 * 
+	 * @param player The player to measure percent chance of winning
+	 * @return The percent change of a the player winning
+	 */
+	public double chanceOfWinning(Player player) {
+		int capitalization = 0;
+		int playersValue = 0;
+		int currValue;
+		for (Player p : getPlayers()) {
+			TradeBroker currBroker = new TradeBroker(p);
+			currValue = 0;
+			for (OwnableTile asset : p.getAssets())
+				currValue += currBroker.valueToClient(asset);
+
+			capitalization += currValue;
+
+			if (player == p)
+				playersValue = currValue;
+		}
+		return (double) playersValue / capitalization;
+
 	}
 
 	/**

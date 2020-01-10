@@ -13,6 +13,7 @@ import Monopoly.Tiles.UtilityTile;
 import java.util.ArrayList;
 
 /**
+ * @author Viraj Shah
  * A monopoly Player class which provides features for managing a players
  * balance, smartly evading bankruptcy, managing properties/assets, using get
  * out of jail free cards, tracking their turns in jail, knowing their position
@@ -467,6 +468,7 @@ public class Player {
 		if (amount > balance) {
 			Logger.log(String.format("Liquidation only yielded only $%d. %s is now bankrupt.", balance, this));
 			balance = -1;
+			getGame().getPlayers().remove(this);
 			return lastBalance;
 		} else {
 			balance -= amount;

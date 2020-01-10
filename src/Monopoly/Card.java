@@ -11,6 +11,7 @@ import Monopoly.Tiles.UtilityTile;
 import java.util.ArrayList;
 
 /**
+ * @author Viraj Shah
  * The Card class provides a container to hold data about Chance and Community
  * Chest cards, and allows for operations on to be done on a Player object.
  */

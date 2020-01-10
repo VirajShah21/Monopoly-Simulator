@@ -3,22 +3,23 @@ import Monopoly.MonopolyGame;
 import Monopoly.Player;
 
 public class SingleGameSimulator {
-    public static void main(String[] args) {
-        Logger.printLogsWhenCreated = true;
+	public static void main(String[] args) {
+		Logger.printLogsWhenCreated = true;
 
+		MonopolyGame game = new MonopolyGame();
 
-        MonopolyGame game = new MonopolyGame();
+		while (game.isRunning()) {
+			game.nextPlayer();
+			game.playTurn();
 
-        while (game.isRunning()) {
-            game.nextPlayer();
-            game.playTurn();
+			System.out.println("\n\n");
+			System.out.println("% Win");
+			for (Player p : game.getPlayers())
+				System.out.printf("%.4f %s: %s\n", game.chanceOfWinning(p), p, p.getAssets());
 
-            System.out.println("\n\n");
-            for (Player p : game.getPlayers())
-                System.out.println(p.toString() + ": " + p.getAssets().toString());
-            System.out.println("\n\n");
-        }
+			System.out.println("\n\n");
+		}
 
-        System.out.println("Final players: " + game.getPlayers());
-    }
+		System.out.println("Final players: " + game.getPlayers());
+	}
 }

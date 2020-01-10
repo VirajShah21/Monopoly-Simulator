@@ -1,6 +1,7 @@
 package Monopoly;
 
 /**
+ * @author Viraj Shah
  * The Dice class allows for realistic random dice rolls. Where two separate events are used to roll a dice.
  * This allows for catching events such as rolling doubles, and a mode-average roll of 7
  */
