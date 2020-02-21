@@ -1,7 +1,6 @@
 package org.virajshah.monopoly.core;
 
 import java.util.ArrayList;
-
 import org.virajshah.monopoly.tiles.FreeParkingTile;
 import org.virajshah.monopoly.tiles.OwnableTile;
 import org.virajshah.monopoly.tiles.PropertyTile;
@@ -9,6 +8,7 @@ import org.virajshah.monopoly.tiles.RailroadTile;
 import org.virajshah.monopoly.tiles.Tile;
 import org.virajshah.monopoly.tiles.UtilityTile;
 import org.virajshah.monopoly.tiles.Tile.TileType;
+import org.virajshah.monopoly.logs.Logger;
 
 /**
  * A monopoly Player class which provides features for managing a players
@@ -67,6 +67,11 @@ public class Player {
 	private int unpaidBalances;
 
 	/**
+	 * The logger object associated with the current game
+	 */
+	private Logger logger;
+
+	/**
 	 * Create a new Player and attach it to a monopoly game.
 	 *
 	 * @param name     The name of the new player
@@ -82,6 +87,7 @@ public class Player {
 		inJail = false;
 		turnsInJail = 0;
 		unpaidBalances = 0;
+		logger = thisGame.getLogger();
 	}
 
 	/**
@@ -241,43 +247,54 @@ public class Player {
 		if (isBankrupt())
 			return;
 
+		logger.info(String.format("Beginning %s's turn", name));
+
 		TradeBroker broker = new TradeBroker(this);
 		int[] roll = Dice.roll2();
 		int moveAmount = roll[0] + roll[1];
 
+		logger.info(String.format("%s rolled a %d and a %d. Moving %d spaces.", name, roll[0], roll[1], moveAmount));
 
 		if (inJail) {
 			turnsInJail++;
+			logger.info(String.format("%s is in jail. Time spent: %d turns", name, turnsInJail + 1));
 
 			if (roll[0] == roll[1]) {
 				inJail = false;
 				turnsInJail = 0;
+				logger.info("\t Rolled doubles... breaking out of jail.");
 			} else if (turnsInJail == 4) {
 				inJail = false;
 				turnsInJail = 0;
-				return;
+				logger.info("\t Sentence served.");
 			} else {
+				logger.info("\t End of turn.");
 				return;
 			}
 		}
 
 		position += moveAmount;
+		
 		if (position > 39) {
 			position -= 40;
 			addBalance(200);
+			logger.info(String.format("%s passed Go. Collecting $200", name));
 		}
-
+		
+		
 
 		Tile currTile = game.tileAt(position);
+		logger.info(String.format("%s moved to %s.", name, currTile.getName()));
 		if (currTile.getType() == TileType.PROPERTY || currTile.getType() == TileType.RAILROAD
 				|| currTile.getType() == TileType.UTILITY) {
 			OwnableTile tile = (OwnableTile) currTile;
 
 			if (!tile.isOwned()) {
 				tile.buy(this);
+				logger.info(String.format("%s is purchasing %s", name, currTile.getName()));
 			} else if (tile.getOwner() != this) {
 				game.payRent(this, tile, moveAmount);
-			} else {
+				logger.info(String.format("%s is paying rent to %s on %s.", name, tile.getOwner(), tile.getName()));
 			}
 		} else if (currTile.getType() == TileType.CHANCE) {
 			Card chanceCard = Card.pickRandomCard(Card.chanceDeck);
@@ -288,9 +305,10 @@ public class Player {
 				OwnableTile tile = (OwnableTile) currTile;
 				if (!tile.isOwned()) {
 					tile.buy(this);
+					logger.info(String.format("%s is purchasing %s", name, currTile.getName()));
 				} else if (tile.getOwner() != this) {
 					game.payRent(this, tile, moveAmount);
-				} else {
+					logger.info(String.format("%s is paying rent to %s on %s.", name, tile.getOwner(), tile.getName()));
 				}
 			}
 		} else if (currTile.getType() == TileType.COMMUNITY_CHEST) {
@@ -302,18 +320,21 @@ public class Player {
 				OwnableTile tile = (OwnableTile) currTile;
 				if (!tile.isOwned()) {
 					tile.buy(this);
+					logger.info(String.format("%s is purchasing %s", name, currTile.getName()));
 				} else if (tile.getOwner() != this) {
 					game.payRent(this, tile, moveAmount);
-				} else {
+					logger.info(String.format("%s is paying rent to %s on %s.", name, tile.getOwner(), tile.getName()));
 				}
 			}
 		} else if (currTile.getType() == TileType.GO_TO_JAIL) {
 			setPosition(10);
 			goToJail();
+			logger.info(String.format("%s got sent to jail.", name));
 		} else if (currTile.getType() == TileType.FREE_PARKING) {
 			int poolSize = ((FreeParkingTile) currTile).getPoolAmount();
 			this.addBalance(poolSize);
 			((FreeParkingTile) currTile).clearPool();
+			logger.info(String.format("%s landed on free parking.", name));
 		} else if (currTile.getType() == TileType.TAX) {
 			if (position == 4) {
 				deductBalance(200);
@@ -337,11 +358,13 @@ public class Player {
 
 				while (property.getHousePrice() < 0.25 * balance && !property.hasHotel() && property.allowedToBuild()) {
 					property.buyHouse();
+					logger.info(String.format("%s bought a house on %s", name, property.getName()));
 				}
 			}
 		}
 
 		if (roll[0] == roll[1]) {
+			logger.info(String.format("Since %s rolled double. They are going again", name));
 			playTurn();
 		}
 
@@ -352,6 +375,7 @@ public class Player {
 			// If un-mortgage amount is less than a quarter of balance
 			if ((assets.get(i).getPropertyValue() / 2) * 1.1 < 0.25 * balance) {
 				assets.get(i).unmortgage();
+				logger.info(String.format("%s unmortgaged %s", name, assets.get(i).getName()));
 			}
 		}
 

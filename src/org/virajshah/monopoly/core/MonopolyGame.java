@@ -1,7 +1,7 @@
 package org.virajshah.monopoly.core;
 
 import java.util.ArrayList;
-
+import org.virajshah.monopoly.logs.Logger;
 import org.virajshah.monopoly.tiles.OwnableTile;
 import org.virajshah.monopoly.tiles.Tile;
 import org.virajshah.monopoly.tiles.UtilityTile;
@@ -33,6 +33,11 @@ public class MonopolyGame {
 	 * A counter for the number of turns played
 	 */
 	private int turnsPlayed;
+	
+	/**
+	 * The logger tool for this monopoly game
+	 */
+	private Logger logger = new Logger(true);
 
 	/**
 	 * The maximum turns allowed to be played during a game
@@ -167,5 +172,13 @@ public class MonopolyGame {
 		} else {
 			System.out.println("Logic Error: Paying rent on non-ownable property");
 		}
+	}
+	
+	/**
+	 * 
+	 * @return The logger associated with the monopoly game
+	 */
+	public Logger getLogger() {
+		return logger;
 	}
 }
