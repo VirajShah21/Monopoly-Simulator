@@ -1,10 +1,10 @@
-package Monopoly;
+package org.virajshah.monopoly;
 
-import Monopoly.LoggerTools.Logger;
-import Monopoly.Tiles.PropertyTile;
-import Monopoly.Tiles.RailroadTile;
-import Monopoly.Tiles.Tile;
-import Monopoly.Tiles.UtilityTile;
+import org.virajshah.monopoly.logger.Logger;
+import org.virajshah.monopoly.tiles.PropertyTile;
+import org.virajshah.monopoly.tiles.RailroadTile;
+import org.virajshah.monopoly.tiles.Tile;
+import org.virajshah.monopoly.tiles.UtilityTile;
 
 /**
  * A POJO which stores transaction information for a trade

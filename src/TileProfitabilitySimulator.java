@@ -1,9 +1,9 @@
-import Monopoly.LoggerTools.LandingLog;
-import Monopoly.LoggerTools.Logger;
-import Monopoly.MonopolyGame;
-
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import org.virajshah.monopoly.MonopolyGame;
+import org.virajshah.monopoly.logger.LandingLog;
+import org.virajshah.monopoly.logger.Logger;
 
 /**
  * The Simulator to test a tiles profitability

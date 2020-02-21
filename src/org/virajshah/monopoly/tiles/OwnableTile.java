@@ -1,9 +1,9 @@
-package Monopoly.Tiles;
-
-import Monopoly.Player;
-import Monopoly.LoggerTools.Logger;
+package org.virajshah.monopoly.tiles;
 
 import java.util.ArrayList;
+
+import org.virajshah.monopoly.Player;
+import org.virajshah.monopoly.logger.Logger;
 
 /**
  * An extension of the Tile class, which has fields and methods for colored

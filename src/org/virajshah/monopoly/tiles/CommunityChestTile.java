@@ -1,4 +1,4 @@
-package Monopoly.Tiles;
+package org.virajshah.monopoly.tiles;
 
 /**
  * The CommunityChestTile class is a vestigial subclass of Tile. The main

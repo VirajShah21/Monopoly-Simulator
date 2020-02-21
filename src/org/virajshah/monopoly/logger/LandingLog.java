@@ -1,4 +1,4 @@
-package Monopoly.LoggerTools;
+package org.virajshah.monopoly.logger;
 
 /**
  * The LandingLog class contains the structure for recording every position of a

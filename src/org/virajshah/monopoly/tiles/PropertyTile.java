@@ -1,8 +1,8 @@
-package Monopoly.Tiles;
-
-import Monopoly.LoggerTools.Logger;
+package org.virajshah.monopoly.tiles;
 
 import java.util.ArrayList;
+
+import org.virajshah.monopoly.logger.Logger;
 
 /**
  * The PropertyTile is an subclass of Tile. It contains fields associated more

@@ -1,14 +1,14 @@
-package Monopoly;
-
-import Monopoly.LoggerTools.Logger;
-import Monopoly.Tiles.FreeParkingTile;
-import Monopoly.Tiles.OwnableTile;
-import Monopoly.Tiles.PropertyTile;
-import Monopoly.Tiles.RailroadTile;
-import Monopoly.Tiles.Tile;
-import Monopoly.Tiles.UtilityTile;
+package org.virajshah.monopoly;
 
 import java.util.ArrayList;
+
+import org.virajshah.monopoly.logger.Logger;
+import org.virajshah.monopoly.tiles.FreeParkingTile;
+import org.virajshah.monopoly.tiles.OwnableTile;
+import org.virajshah.monopoly.tiles.PropertyTile;
+import org.virajshah.monopoly.tiles.RailroadTile;
+import org.virajshah.monopoly.tiles.Tile;
+import org.virajshah.monopoly.tiles.UtilityTile;
 
 /**
  * The Card class provides a container to hold data about Chance and Community

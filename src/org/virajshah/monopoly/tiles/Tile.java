@@ -1,4 +1,4 @@
-package Monopoly.Tiles;
+package org.virajshah.monopoly.tiles;
 
 
 /**

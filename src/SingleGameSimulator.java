@@ -1,6 +1,6 @@
-import Monopoly.LoggerTools.Logger;
-import Monopoly.MonopolyGame;
-import Monopoly.Player;
+import org.virajshah.monopoly.MonopolyGame;
+import org.virajshah.monopoly.Player;
+import org.virajshah.monopoly.logger.Logger;
 
 /**
  * A simulator to simulate one game of monopoly with logs

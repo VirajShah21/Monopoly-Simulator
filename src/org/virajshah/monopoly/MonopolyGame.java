@@ -1,11 +1,11 @@
-package Monopoly;
-
-import Monopoly.LoggerTools.Logger;
-import Monopoly.Tiles.OwnableTile;
-import Monopoly.Tiles.Tile;
-import Monopoly.Tiles.UtilityTile;
+package org.virajshah.monopoly;
 
 import java.util.ArrayList;
+
+import org.virajshah.monopoly.logger.Logger;
+import org.virajshah.monopoly.tiles.OwnableTile;
+import org.virajshah.monopoly.tiles.Tile;
+import org.virajshah.monopoly.tiles.UtilityTile;
 
 /**
  * The MonopolyGame class is responsible for handling all functions of an

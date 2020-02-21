@@ -1,4 +1,4 @@
-package Monopoly.LoggerTools;
+package org.virajshah.monopoly.logger;
 
 import java.util.ArrayList;
 

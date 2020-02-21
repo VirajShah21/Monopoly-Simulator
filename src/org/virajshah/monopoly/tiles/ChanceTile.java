@@ -1,4 +1,4 @@
-package Monopoly.Tiles;
+package org.virajshah.monopoly.tiles;
 
 /**
  * The ChanceTile class is a vestigial subclass of Tile. The main distinction is

@@ -1,4 +1,4 @@
-package Monopoly.Tiles;
+package org.virajshah.monopoly.tiles;
 
 /**
  * The GoTile class is an extension of Tile, with no internal differences in

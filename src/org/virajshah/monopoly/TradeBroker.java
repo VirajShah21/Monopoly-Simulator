@@ -1,8 +1,8 @@
-package Monopoly;
+package org.virajshah.monopoly;
 
 import java.util.*;
 
-import Monopoly.Tiles.*;
+import org.virajshah.monopoly.tiles.*;
 
 /**
  * Builds win-win trades for any two players. The TradeBroker class associates
