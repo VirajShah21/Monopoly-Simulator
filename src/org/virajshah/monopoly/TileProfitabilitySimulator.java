@@ -1,9 +1,8 @@
+package org.virajshah.monopoly;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.virajshah.monopoly.MonopolyGame;
-import org.virajshah.monopoly.logger.LandingLog;
-import org.virajshah.monopoly.logger.Logger;
+import org.virajshah.monopoly.core.MonopolyGame;
 
 /**
  * The Simulator to test a tiles profitability
@@ -17,8 +16,6 @@ class TileProfitabilitySimulator {
 	private static final int TRIALS = 20; // minimum value is 20
 
 	public static void main(String[] args) {
-		Logger.printLogsWhenCreated = false;
-
 		MonopolyGame game = new MonopolyGame();
 		System.out.println("Progress: |                    |");
 		System.out.print("           ");
@@ -30,21 +27,14 @@ class TileProfitabilitySimulator {
 			if (i % (TRIALS / 20) == 0)
 				System.out.print("=");
 			game = new MonopolyGame();
-			Logger.clearAllMessageLogs();
 		}
 		System.out.println();
 
-		int landingLogSize = Logger.getLandingLogStream().size();
-		ArrayList<LandingLog> landingLogs = Logger.getLandingLogStream();
 
 		int[] tileFrequency = new int[40];
 		int[] tileProfits = new int[40];
 
-		for (int i = 0; i < landingLogSize; i++) {
-			LandingLog log = landingLogs.get(i);
-			tileFrequency[log.getTile()]++;
-			tileProfits[log.getTile()] += log.getRentDue();
-		}
+		
 
 		System.out.println(Arrays.toString(tileFrequency));
 

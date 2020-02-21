@@ -1,4 +1,4 @@
-package org.virajshah.monopoly;
+package org.virajshah.monopoly.core;
 
 import java.util.*;
 

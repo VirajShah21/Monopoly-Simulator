@@ -1,9 +1,7 @@
-package org.virajshah.monopoly;
+package org.virajshah.monopoly.core;
 
 import java.util.ArrayList;
 
-import org.virajshah.monopoly.logger.LandingLog;
-import org.virajshah.monopoly.logger.Logger;
 import org.virajshah.monopoly.tiles.FreeParkingTile;
 import org.virajshah.monopoly.tiles.OwnableTile;
 import org.virajshah.monopoly.tiles.PropertyTile;
@@ -247,7 +245,6 @@ public class Player {
 		int[] roll = Dice.roll2();
 		int moveAmount = roll[0] + roll[1];
 
-		Logger.log(String.format("%s rolled a %d and %d. Total: %d", this, roll[0], roll[1], moveAmount));
 
 		if (inJail) {
 			turnsInJail++;
@@ -255,16 +252,11 @@ public class Player {
 			if (roll[0] == roll[1]) {
 				inJail = false;
 				turnsInJail = 0;
-				Logger.log(String.format("%s rolled double %d's. Player will move %d spaces from jail", this, roll[0],
-						roll[0] * 2));
 			} else if (turnsInJail == 4) {
 				inJail = false;
 				turnsInJail = 0;
-				Logger.log(String.format("%s rolled for the fourth time in jail. Moving %d spaces\n", this,
-						roll[0] + roll[1]));
 				return;
 			} else {
-				Logger.log(String.format("%s is still stuck in jail.\n", this));
 				return;
 			}
 		}
@@ -275,7 +267,6 @@ public class Player {
 			addBalance(200);
 		}
 
-		Logger.log(String.format("%s moved to %s", this, game.tileAt(position)));
 
 		Tile currTile = game.tileAt(position);
 		if (currTile.getType() == TileType.PROPERTY || currTile.getType() == TileType.RAILROAD
@@ -284,58 +275,45 @@ public class Player {
 
 			if (!tile.isOwned()) {
 				tile.buy(this);
-				Logger.log(new LandingLog(this.name, position, 0));
 			} else if (tile.getOwner() != this) {
 				game.payRent(this, tile, moveAmount);
-				Logger.log(new LandingLog(name, position, tile.getRent()));
 			} else {
-				Logger.log(new LandingLog(name, position, 0));
 			}
 		} else if (currTile.getType() == TileType.CHANCE) {
 			Card chanceCard = Card.pickRandomCard(Card.chanceDeck);
 			chanceCard.pickup(this);
-			Logger.log(new LandingLog(name, position, 0));
 
 			if (currTile.getType() == TileType.PROPERTY || currTile.getType() == TileType.RAILROAD
 					|| currTile.getType() == TileType.UTILITY) {
 				OwnableTile tile = (OwnableTile) currTile;
 				if (!tile.isOwned()) {
 					tile.buy(this);
-					Logger.log(new LandingLog(name, position, 0));
 				} else if (tile.getOwner() != this) {
 					game.payRent(this, tile, moveAmount);
-					Logger.log(new LandingLog(name, position, tile.getRent()));
 				} else {
-					Logger.log(new LandingLog(name, position, 0));
 				}
 			}
 		} else if (currTile.getType() == TileType.COMMUNITY_CHEST) {
 			Card ccCard = Card.pickRandomCard(Card.communityChestDeck);
 			ccCard.pickup(this);
-			Logger.log(new LandingLog(name, position, 0));
 
 			if (currTile.getType() == TileType.PROPERTY || currTile.getType() == TileType.RAILROAD
 					|| currTile.getType() == TileType.UTILITY) {
 				OwnableTile tile = (OwnableTile) currTile;
 				if (!tile.isOwned()) {
 					tile.buy(this);
-					Logger.log(new LandingLog(name, position, 0));
 				} else if (tile.getOwner() != this) {
 					game.payRent(this, tile, moveAmount);
-					Logger.log(new LandingLog(name, position, tile.getRent()));
 				} else {
-					Logger.log(new LandingLog(name, position, 0));
 				}
 			}
 		} else if (currTile.getType() == TileType.GO_TO_JAIL) {
 			setPosition(10);
 			goToJail();
-			Logger.log(new LandingLog(name, position, 0));
 		} else if (currTile.getType() == TileType.FREE_PARKING) {
 			int poolSize = ((FreeParkingTile) currTile).getPoolAmount();
 			this.addBalance(poolSize);
 			((FreeParkingTile) currTile).clearPool();
-			Logger.log(new LandingLog(name, position, 0));
 		} else if (currTile.getType() == TileType.TAX) {
 			if (position == 4) {
 				deductBalance(200);
@@ -344,7 +322,6 @@ public class Player {
 				deductBalance(100);
 				((FreeParkingTile) game.tileAt(20)).addToPool(100);
 			}
-			Logger.log(new LandingLog(name, position, 0));
 		}
 
 		if (!isBankrupt())
@@ -365,7 +342,6 @@ public class Player {
 		}
 
 		if (roll[0] == roll[1]) {
-			Logger.log(String.format("%s rolled doubles (%d). %s will roll again.", this, roll[0], this));
 			playTurn();
 		}
 
@@ -464,19 +440,16 @@ public class Player {
 	 */
 	public int deductBalance(int amount) {
 		if (amount > balance) {
-			Logger.log(String.format("Cannot deduct $%d from %s. Begining liquidation.", amount, this));
 			liquidate(amount);
 		}
 		int lastBalance = balance;
 
 		if (amount > balance) {
-			Logger.log(String.format("Liquidation only yielded only $%d. %s is now bankrupt.", balance, this));
 			balance = -1;
 			getGame().getPlayers().remove(this);
 			return lastBalance;
 		} else {
 			balance -= amount;
-			Logger.log(String.format("Deducted $%d from %s", amount, this));
 			return amount;
 		}
 	}
@@ -508,22 +481,17 @@ public class Player {
 	 * @param amount The amount of money to transfer.
 	 */
 	public void payTo(Player other, int amount) {
-		Logger.log(String.format("A transfer of $%d from %s to %s has been opened", amount, this, other));
 
 		int amountDeducted = deductBalance(amount);
 
 		if (amountDeducted == amount) {
 			other.addBalance(amount);
-			Logger.log(String.format("\t%s paid %s $%d in full", this, other, amount));
 		} else {
 			other.addBalance(amountDeducted);
 			for (int i = 0; i < assets.size(); i++)
 				assets.get(i).transferOwnership(other);
-			Logger.log(String.format("\t%s bankrupted %s; %s recieved $%d and all %s's assets", other, this, other,
-					amount - unpaidBalances, this));
 		}
 
-		Logger.log("The transfer has closed");
 	}
 
 	/**

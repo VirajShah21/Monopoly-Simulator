@@ -1,8 +1,7 @@
-package org.virajshah.monopoly;
+package org.virajshah.monopoly.core;
 
 import java.util.ArrayList;
 
-import org.virajshah.monopoly.logger.Logger;
 import org.virajshah.monopoly.tiles.OwnableTile;
 import org.virajshah.monopoly.tiles.Tile;
 import org.virajshah.monopoly.tiles.UtilityTile;
@@ -151,8 +150,6 @@ public class MonopolyGame {
 	public void payRent(Player payer, OwnableTile tile, int roll) {
 		if (tile.getType() == Tile.TileType.UTILITY)
 			((UtilityTile) tile).setLastDiceRoll(roll);
-		Logger.log(
-				String.format("%s is paying $%d to %s for rent on %s", payer, tile.getRent(), tile.getOwner(), tile));
 		payer.payTo(tile.getOwner(), tile.getRent());
 	}
 
@@ -164,7 +161,6 @@ public class MonopolyGame {
 	 */
 	public void payRent(Player payer, OwnableTile tile) {
 		if (tile.getType() == Tile.TileType.PROPERTY || tile.getType() == Tile.TileType.RAILROAD) {
-			Logger.log(String.format("%s payed $%d %s for rent on %s", payer, tile.getRent(), tile.getOwner(), tile));
 
 			payer.deductBalance(tile.getRent());
 			tile.getOwner().addBalance(tile.getRent());

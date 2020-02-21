@@ -1,4 +1,4 @@
-package org.virajshah.monopoly;
+package org.virajshah.monopoly.core;
 
 /**
  * The Dice class allows for realistic random dice rolls. Where two separate

@@ -2,8 +2,7 @@ package org.virajshah.monopoly.tiles;
 
 import java.util.ArrayList;
 
-import org.virajshah.monopoly.Player;
-import org.virajshah.monopoly.logger.Logger;
+import org.virajshah.monopoly.core.Player;
 
 /**
  * An extension of the Tile class, which has fields and methods for colored
@@ -108,7 +107,6 @@ public abstract class OwnableTile extends Tile {
 		if (!mortgaged) {
 			mortgaged = true;
 			owner.addBalance(propertyValue / 2);
-			Logger.log(String.format("%s mortgaged %s for %d", owner, this, propertyValue / 2));
 		}
 	}
 
@@ -119,7 +117,6 @@ public abstract class OwnableTile extends Tile {
 		if (mortgaged && owner.getBalance() > 1.1 * (propertyValue / 2)) {
 			mortgaged = false;
 			owner.deductBalance((int) (1.1 * (propertyValue / 2)));
-			Logger.log(String.format("%s unmortgaged %s for %d", owner, this, propertyValue));
 		}
 	}
 

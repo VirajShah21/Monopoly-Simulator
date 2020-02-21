@@ -1,8 +1,7 @@
-package org.virajshah.monopoly;
+package org.virajshah.monopoly.core;
 
 import java.util.ArrayList;
 
-import org.virajshah.monopoly.logger.Logger;
 import org.virajshah.monopoly.tiles.FreeParkingTile;
 import org.virajshah.monopoly.tiles.OwnableTile;
 import org.virajshah.monopoly.tiles.PropertyTile;
@@ -59,7 +58,6 @@ public class Card {
 	 * @param player The player which picks up this card
 	 */
 	void pickup(Player player) {
-		Logger.log(String.format("%s picked up the card: %s", player, this));
 		String[] calls = call.split(";");
 
 		// Clean up each command

@@ -1,6 +1,6 @@
-import org.virajshah.monopoly.MonopolyGame;
-import org.virajshah.monopoly.Player;
-import org.virajshah.monopoly.logger.Logger;
+package org.virajshah.monopoly;
+import org.virajshah.monopoly.core.MonopolyGame;
+import org.virajshah.monopoly.core.Player;
 
 /**
  * A simulator to simulate one game of monopoly with logs
@@ -10,7 +10,6 @@ import org.virajshah.monopoly.logger.Logger;
  */
 public class GameSimulator {
 	public static void main(String[] args) {
-		Logger.printLogsWhenCreated = true;
 
 		MonopolyGame game = new MonopolyGame();
 

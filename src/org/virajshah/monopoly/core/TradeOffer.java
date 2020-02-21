@@ -1,6 +1,5 @@
-package org.virajshah.monopoly;
+package org.virajshah.monopoly.core;
 
-import org.virajshah.monopoly.logger.Logger;
 import org.virajshah.monopoly.tiles.PropertyTile;
 import org.virajshah.monopoly.tiles.RailroadTile;
 import org.virajshah.monopoly.tiles.Tile;
@@ -89,8 +88,5 @@ public class TradeOffer {
 			System.out.println(receiverTile + " is not an ownable asset");
 			return;
 		}
-
-		Logger.log(String.format("%s and %s executed a trade: %s and $%d for %s", sender, receiver, senderTile,
-				cashOffer, receiverTile));
 	}
 }

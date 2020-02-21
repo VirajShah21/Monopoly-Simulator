@@ -2,8 +2,6 @@ package org.virajshah.monopoly.tiles;
 
 import java.util.ArrayList;
 
-import org.virajshah.monopoly.logger.Logger;
-
 /**
  * The PropertyTile is an subclass of Tile. It contains fields associated more
  * specifically with those of colored properties on a Monopoly game board.
@@ -179,9 +177,7 @@ public class PropertyTile extends OwnableTile {
 			this.houses++;
 
 			if (houses < 5) {
-				Logger.log(String.format("%s bought a house on %s for $%d", owner, this, getHousePrice()));
 			} else {
-				Logger.log(String.format("%s bought a hotel on %s for $%d", owner, this, getHousePrice()));
 			}
 			return true;
 		}
@@ -214,7 +210,6 @@ public class PropertyTile extends OwnableTile {
 		if (houses > 0) {
 			houses--;
 			owner.addBalance(getHousePrice() / 2);
-			Logger.log(String.format("%s sold a house on %s", owner, this));
 		}
 	}
 
@@ -230,7 +225,6 @@ public class PropertyTile extends OwnableTile {
 			}
 			highestProperty.sellHouse();
 		} else {
-			Logger.log("Something wen't wrong. Cannot sell a house on a property which is not a monopoly");
 		}
 	}
 
