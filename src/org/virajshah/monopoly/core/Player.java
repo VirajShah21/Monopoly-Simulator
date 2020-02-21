@@ -274,14 +274,12 @@ public class Player {
 		}
 
 		position += moveAmount;
-		
+
 		if (position > 39) {
 			position -= 40;
 			addBalance(200);
 			logger.info(String.format("%s passed Go. Collecting $200", name));
 		}
-		
-		
 
 		Tile currTile = game.tileAt(position);
 		logger.info(String.format("%s moved to %s.", name, currTile.getName()));
