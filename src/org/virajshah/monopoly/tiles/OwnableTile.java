@@ -1,6 +1,6 @@
 package org.virajshah.monopoly.tiles;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.virajshah.monopoly.core.Player;
 
@@ -22,7 +22,7 @@ public abstract class OwnableTile extends Tile {
 	 * True if the asset is mortgaged
 	 */
 	protected boolean mortgaged;
-	
+
 	/**
 	 * The price of the property
 	 */
@@ -114,9 +114,9 @@ public abstract class OwnableTile extends Tile {
 	 * Unmortgages a property if the owner has enough funds
 	 */
 	public void unmortgage() {
-		if (mortgaged && owner.getBalance() > 1.1 * (propertyValue / 2)) {
+		if (mortgaged && owner.getBalance() > 1.1 * ((double) propertyValue / 2)) {
 			mortgaged = false;
-			owner.deductBalance((int) (1.1 * (propertyValue / 2)));
+			owner.deductBalance((int) (1.1 * ((double) propertyValue / 2)));
 		}
 	}
 
@@ -144,8 +144,11 @@ public abstract class OwnableTile extends Tile {
 	/**
 	 * @return A list of assets belonging to the same monopoly set and owner
 	 */
-	abstract ArrayList<? extends OwnableTile> getMonopolySet();
+	abstract List<? extends OwnableTile> getMonopolySet();
+	// Keep the generic wildcard type despite sonar lint (causes issues in
+	// PropertyTile
 
+	@Override
 	public String toString() {
 		if (isMortgaged()) {
 			return getName() + " (Mortgaged)";

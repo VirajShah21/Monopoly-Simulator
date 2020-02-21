@@ -1,6 +1,8 @@
 package org.virajshah.monopoly.core;
 
 import java.util.ArrayList;
+import java.util.List;
+
 import org.virajshah.monopoly.logs.Logger;
 import org.virajshah.monopoly.tiles.OwnableTile;
 import org.virajshah.monopoly.tiles.Tile;
@@ -42,7 +44,7 @@ public class MonopolyGame {
 	/**
 	 * The maximum turns allowed to be played during a game
 	 */
-	private final int maxTurnsAllowed = 10000;
+	private static final int MAX_TURNS_ALLOWED = 10000;
 
 	/**
 	 * Initializes a new monopoly game with a new board, and four players.
@@ -66,7 +68,7 @@ public class MonopolyGame {
 	 * @return True if the game is still in a playable state, false otherwise
 	 */
 	public boolean isRunning() {
-		return turnsPlayed < maxTurnsAllowed && players.size() > 1;
+		return turnsPlayed < MAX_TURNS_ALLOWED && players.size() > 1;
 	}
 
 	/**
@@ -82,12 +84,8 @@ public class MonopolyGame {
 			if (players.get(currentPlayer).isBankrupt())
 				nextPlayer();
 		} catch (StackOverflowError e) {
-			System.out.println("Every player is now bankrupt.");
+			logger.error("Every player is now bankrupt.");
 			System.exit(0);
-		}
-
-		if (players.get(currentPlayer).getBalance() < 0) {
-			new Exception().printStackTrace();
 		}
 	}
 
@@ -97,7 +95,7 @@ public class MonopolyGame {
 	public void playTurn() {
 		turnsPlayed++;
 
-		if (turnsPlayed < maxTurnsAllowed) {
+		if (turnsPlayed < MAX_TURNS_ALLOWED) {
 			players.get(currentPlayer).playTurn();
 		}
 	}
@@ -124,14 +122,14 @@ public class MonopolyGame {
 			if (player == p)
 				playersValue = currValue;
 		}
-		return (double) playersValue / capitalization;
+		return capitalization != 0 ? (double) playersValue / capitalization : 0;
 
 	}
 
 	/**
 	 * @return The players in the current game
 	 */
-	public ArrayList<Player> getPlayers() {
+	public List<Player> getPlayers() {
 		return players;
 	}
 
@@ -170,7 +168,7 @@ public class MonopolyGame {
 			payer.deductBalance(tile.getRent());
 			tile.getOwner().addBalance(tile.getRent());
 		} else {
-			System.out.println("Logic Error: Paying rent on non-ownable property");
+			logger.error("Logic Error: Paying rent on non-ownable property");
 		}
 	}
 	

@@ -1,13 +1,14 @@
 package org.virajshah.monopoly.core;
 
 import java.util.ArrayList;
-
+import java.util.Random;
 import org.virajshah.monopoly.tiles.FreeParkingTile;
 import org.virajshah.monopoly.tiles.OwnableTile;
 import org.virajshah.monopoly.tiles.PropertyTile;
 import org.virajshah.monopoly.tiles.RailroadTile;
 import org.virajshah.monopoly.tiles.Tile;
 import org.virajshah.monopoly.tiles.UtilityTile;
+import org.virajshah.monopoly.logs.Logger;
 
 /**
  * The Card class provides a container to hold data about Chance and Community
@@ -16,6 +17,21 @@ import org.virajshah.monopoly.tiles.UtilityTile;
  * @author Viraj Shah
  */
 public class Card {
+	/**
+	 * Instead of duplicating the literal "pay 50;" 3 times... SonarLint
+	 */
+	private static final String PAY_50 = "pay 50;";
+
+	/**
+	 * Logger (just for printing errors)
+	 */
+	private static Logger logger = new Logger(true);
+
+	/**
+	 * The random number generator object
+	 */
+	private static final Random randomGenerator = new Random();
+
 	/**
 	 * The message read on the card
 	 */
@@ -38,7 +54,7 @@ public class Card {
 	}
 
 	/**
-	 * @return The message read on the chace/community chest card
+	 * @return The message read on the chance/community chest card
 	 */
 	public String getMessage() {
 		return message;
@@ -49,6 +65,54 @@ public class Card {
 	 */
 	public String getCall() {
 		return call;
+	}
+	
+	/**
+	 * Helper method for pickup(Player). It cleans the commands listed in the card info.
+	 * @param commands The array of commands to clean
+	 */
+	private void cleanCommands(String[] commands) {
+		for (int i = 0; i < commands.length; i++) {
+			String currCall = commands[i];
+			while (currCall.charAt(0) == ' ')
+				currCall = currCall.substring(1);
+
+			while (currCall.charAt(currCall.length() - 1) == ' ')
+				currCall = currCall.substring(0, currCall.length() - 1);
+
+			commands[i] = currCall;
+		}
+	}
+	
+	private static void advancePlayerTo(Player player, int location) {
+		int advanceTo = location;
+
+		if (player.getPosition() > advanceTo)
+			player.addBalance(200); // For passing GO
+
+		player.setPosition(advanceTo);
+	}
+	
+	private static void advancePlayerTo(Player player, char place) {
+		int playerPos = player.getPosition();
+		
+		if (place == 'r') {
+			while (!(playerPos % 10 != 0 && playerPos % 5 == 0)) {
+				playerPos++;
+				if (playerPos > 39)
+					playerPos = 0;
+			}
+			player.setPosition(playerPos);
+		} else if (place == 'u') {
+			while (!(playerPos == 12 || playerPos == 28)) {
+				playerPos++;
+				if (playerPos > 39)
+					playerPos = 0;
+			}
+			player.setPosition(playerPos);
+		} else {
+			logger.error("Cannot advance to nearest: \"" + place + "\"");
+		}
 	}
 
 	/**
@@ -61,56 +125,22 @@ public class Card {
 		String[] calls = call.split(";");
 
 		// Clean up each command
-		for (int i = 0; i < calls.length; i++) {
-			String currCall = calls[i];
-			while (currCall.charAt(0) == ' ')
-				currCall = currCall.substring(1);
-
-			while (currCall.charAt(currCall.length() - 1) == ' ')
-				currCall = currCall.substring(0, currCall.length() - 1);
-
-			calls[i] = currCall;
-		}
+		cleanCommands(calls);
 
 		// Loop through the array of commands
-		for (String call : calls) {
-			String[] words = call.split(" ");
+		for (String currCall : calls) {
+			String[] words = currCall.split(" ");
 
 			if (words[0].equals("advance")) {
-				if (words[1].equals("nearest")) {
-					int playerPos = player.getPosition();
-
-					if (words[2].equals("railroad")) {
-						while (!(playerPos % 10 != 0 && playerPos % 5 == 0)) {
-							playerPos++;
-							if (playerPos > 39)
-								playerPos = 0;
-						}
-						player.setPosition(playerPos);
-					} else if (words[2].equals("utility")) {
-						while (!(playerPos == 12 || playerPos == 28)) {
-							playerPos++;
-							if (playerPos > 39)
-								playerPos = 0;
-						}
-						player.setPosition(playerPos);
-					} else {
-						System.out.println("Cannot advance to nearest: \"" + words[2] + "\"");
-					}
-				} else {
-					int advanceTo = Integer.parseInt(words[1]);
-
-					if (player.getPosition() > advanceTo)
-						player.addBalance(200); // For passing GO
-
-					player.setPosition(advanceTo);
-				}
-
+				if (words[1].equals("nearest"))
+					advancePlayerTo(player, words[2].charAt(0));
+				else
+					advancePlayerTo(player, Integer.parseInt(words[1]));
 			} else if (words[0].equals("goto")) {
 				player.setPosition(Integer.parseInt(words[1]));
 			} else if (words[0].equals("earn")) {
 				if (words[1].equals("from-all")) {
-					ArrayList<Player> players = player.getGame().getPlayers();
+					ArrayList<Player> players = (ArrayList<Player>)(player.getGame().getPlayers());
 
 					int amount = Integer.parseInt(words[2]);
 					for (int i = 0; i < players.size(); i++) {
@@ -126,7 +156,7 @@ public class Card {
 					// The logic in this block works out perfectly
 					// 1.
 					int amount = Integer.parseInt(words[2]);
-					ArrayList<Player> otherPlayers = player.getGame().getPlayers();
+					ArrayList<Player> otherPlayers = (ArrayList<Player>)(player.getGame().getPlayers());
 					player.deductBalance(amount * otherPlayers.size());
 					for (Player otherPlayer : otherPlayers) {
 						otherPlayer.addBalance(amount);
@@ -140,7 +170,7 @@ public class Card {
 					for (OwnableTile asset : player.getAssets()) {
 						if (asset.getType() == Tile.TileType.PROPERTY) {
 							PropertyTile property = (PropertyTile) asset;
-							totalFee += property.hasHotel() ? hotelAmount : property.getHouses() * houseAmount;
+							totalFee += property.hasHotel() ? hotelAmount : property.getNumberOfHouses() * houseAmount;
 
 						}
 					}
@@ -180,7 +210,7 @@ public class Card {
 				int moveBy = Integer.parseInt(words[1]);
 				player.setPosition(player.getPosition() + moveBy);
 			} else {
-				System.out.println("An unknown call has been found: " + words[0]);
+				logger.error("An unknown call has been found: " + words[0]);
 			}
 		}
 	}
@@ -188,9 +218,9 @@ public class Card {
 	/**
 	 * The deck of community chest cards
 	 */
-	public static final Card[] communityChestDeck = { new Card("Advance to Go. Collect $200.", "goto 0; earn 200;"),
-			new Card("Bank error in your favor. Collect $200.", "earn 200;"),
-			new Card("Doctor fees. Pay $50.", "pay 50;"), new Card("From sale of stock you get $50.", "earn 50;"),
+	protected static final Card[] communityChestDeck = { new Card("Advance to Go. Collect $200.", "goto 0; earn 200;"),
+			new Card("Bank error in your favor. Collect $200.", "earn 200;"), new Card("Doctor fees. Pay $50.", PAY_50),
+			new Card("From sale of stock you get $50.", "earn 50;"),
 			new Card("Get out of jail free. – This card may be kept until needed or sold/traded.", "get-out-of-jail;"),
 			new Card("Go to jail. Go directly to jail. Do not pass Go, Do not collect $200.", "go-to-jail;"),
 			new Card("Grand Opera Night. Collect $50 from every player for opening night seats", "earn from-all 50;"),
@@ -198,7 +228,7 @@ public class Card {
 			new Card("Income tax refund. Collect $20.", "earn 20;"),
 			new Card("It's your birthday. Collect $10 from every player.", "earn from-all 10;"),
 			new Card("Life insurance matures. Collect $100", "earn 100;"),
-			new Card("Hospital Fees. Pay $50.", "pay 50;"), new Card("School Fees. Pay $50.", "pay 50;"),
+			new Card("Hospital Fees. Pay $50.", PAY_50), new Card("School Fees. Pay $50.", PAY_50),
 			new Card("Receive $25 consultancy fee.", "earn 25;"),
 			new Card("You are assessed for street repairs: Pay $40 per house and $115 per hotel you own.",
 					"pay buildings 40 115"),
@@ -208,7 +238,7 @@ public class Card {
 	/**
 	 * The deck of chance cards
 	 */
-	static final Card[] chanceDeck = { new Card("Advance to Go. Collect $200.", "goto 0; earn 200;"),
+	protected static final Card[] chanceDeck = { new Card("Advance to Go. Collect $200.", "goto 0; earn 200;"),
 			new Card("Advance to Illinois Avenue. If you pass Go, collect $200.", "advance 24;"),
 			new Card("Advance to St. Charles Place. If you pass Go, collect $200.", "advance 16;"),
 			new Card(
@@ -236,7 +266,7 @@ public class Card {
 	 * @return A random card object from the deck provided
 	 */
 	static Card pickRandomCard(Card[] deck) {
-		int index = (int) (Math.random() * deck.length);
+		int index = randomGenerator.nextInt(deck.length);
 		return deck[index];
 	}
 

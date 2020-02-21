@@ -73,9 +73,6 @@ public class TradeOffer {
 			((RailroadTile) senderTile).transferOwnership(receiver);
 		} else if (senderTile.getType() == Tile.TileType.UTILITY) {
 			((UtilityTile) senderTile).transferOwnership(receiver);
-		} else {
-			System.out.println(senderTile + " is not an ownable asset");
-			return;
 		}
 
 		if (receiverTile.getType() == Tile.TileType.PROPERTY) {
@@ -84,9 +81,6 @@ public class TradeOffer {
 			((RailroadTile) receiverTile).transferOwnership(sender);
 		} else if (receiverTile.getType() == Tile.TileType.UTILITY) {
 			((UtilityTile) receiverTile).transferOwnership(sender);
-		} else {
-			System.out.println(receiverTile + " is not an ownable asset");
-			return;
 		}
 	}
 }

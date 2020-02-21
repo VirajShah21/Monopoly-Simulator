@@ -1,5 +1,7 @@
 package org.virajshah.monopoly.core;
 
+import java.util.Random;
+
 /**
  * The Dice class allows for realistic random dice rolls. Where two separate
  * events are used to roll a dice. This allows for catching events such as
@@ -8,13 +10,22 @@ package org.virajshah.monopoly.core;
  * @author Viraj Shah
  */
 class Dice {
+	private Dice() {
+		// Utility class
+	}
+	
+	/**
+	 * Random number generator
+	 */
+	private static Random randomGenerator = new Random();
+	
 	/**
 	 * Roll a single die
 	 *
 	 * @return A random number between 1 and 6, inclusive
 	 */
 	static int roll1() {
-		return (int) (Math.random() * 6) + 1;
+		return randomGenerator.nextInt(6) + 1;
 	}
 
 	/**

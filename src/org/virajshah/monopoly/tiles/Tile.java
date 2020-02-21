@@ -11,7 +11,7 @@ public abstract class Tile {
     /**
      * Enumeration used to express the type of tile the current *Tile object refers to
      */
-    public static enum TileType {
+    public enum TileType {
         PROPERTY, UTILITY, RAILROAD, CHANCE, COMMUNITY_CHEST, TAX, FREE_PARKING,
         GO_TO_JAIL, JAIL, GO
     }
@@ -19,12 +19,12 @@ public abstract class Tile {
     /**
      * The TileType of an instance of a Tile
      */
-    TileType TYPE;
+    protected final TileType type;
 
     /**
      * The actual name of an instance of a Tile; eg: Reading Railroad, Boardwalk, GO, etc.
      */
-    String NAME;
+	protected final String name;
 
     /**
      * Constructs the prototype for all Tile subclasses
@@ -33,15 +33,15 @@ public abstract class Tile {
      * @param tileName The name of the tile or property/utility/railroad name
      */
     Tile(TileType tileType, String tileName) {
-        TYPE = tileType;
-        NAME = tileName;
+        type = tileType;
+        name = tileName;
     }
 
     /**
      * @return The type of instance of a Tile subclass
      */
     public TileType getType() {
-        return TYPE;
+        return type;
     }
 
     /**
@@ -49,7 +49,7 @@ public abstract class Tile {
      */
     @SuppressWarnings("unused")
     public String getName() {
-        return NAME;
+        return name;
     }
 
     /**
@@ -130,6 +130,6 @@ public abstract class Tile {
      * @return The name of a tile
      */
     public String toString() {
-        return NAME;
+        return name;
     }
 }

@@ -74,13 +74,11 @@ public class TradeBroker {
 		double value = 200;
 		double setCompletion;
 
-		{
-			HashMap<OwnableTile, Double> setCompletions = getSetCompletions();
-			if (setCompletions.keySet().contains(asset))
-				setCompletion = getSetCompletions().get(asset);
-			else
-				setCompletion = 0;
-		}
+		HashMap<OwnableTile, Double> setCompletions = getSetCompletions();
+		if (setCompletions.keySet().contains(asset))
+			setCompletion = getSetCompletions().get(asset);
+		else
+			setCompletion = 0;
 
 		if (setCompletion == 1) {
 			value *= 2;
@@ -93,8 +91,8 @@ public class TradeBroker {
 
 			if (setCompletion == 1) {
 				PropertyTile property = (PropertyTile) asset;
-				if (property.getHouses() > 0) {
-					value *= property.getHouses();
+				if (property.getNumberOfHouses() > 0) {
+					value *= property.getNumberOfHouses();
 				}
 			}
 		}
@@ -110,7 +108,7 @@ public class TradeBroker {
 	 * @return An ArrayList of OwnableTiles which describe the most wanted
 	 *         properties by the client
 	 */
-	public ArrayList<OwnableTile> mostWantedProperties(double completionThreshold) {
+	public List<OwnableTile> mostWantedProperties(double completionThreshold) {
 		HashMap<OwnableTile, Double> completionRates = getSetCompletions();
 		ArrayList<OwnableTile> wanted = new ArrayList<>();
 
@@ -137,13 +135,13 @@ public class TradeBroker {
 	 * 
 	 * @return An ArrayList of the most wanted properties
 	 */
-	public ArrayList<OwnableTile> mostWantedProperties() {
+	public List<OwnableTile> mostWantedProperties() {
 		double completionThreshold = 0.5;
-		ArrayList<OwnableTile> wanted = mostWantedProperties(completionThreshold);
+		ArrayList<OwnableTile> wanted = (ArrayList<OwnableTile>)mostWantedProperties(completionThreshold);
 
-		while (wanted.size() < 1 && completionThreshold >= 0) {
+		while (wanted.isEmpty() && completionThreshold >= 0) {
 			completionThreshold -= 0.1;
-			wanted = mostWantedProperties(completionThreshold);
+			wanted = (ArrayList<OwnableTile>)mostWantedProperties(completionThreshold);
 		}
 
 		return wanted;
@@ -172,9 +170,9 @@ public class TradeBroker {
 	 */
 	public boolean hasAssetFromSet(Tile.TileType tileType) {
 		if (tileType == Tile.TileType.RAILROAD) {
-			return client.getRailroads().size() > 0;
+			return !client.getRailroads().isEmpty();
 		} else if (tileType == Tile.TileType.UTILITY) {
-			return client.getUtilities().size() > 0;
+			return !client.getUtilities().isEmpty();
 		} else {
 			return false;
 		}
@@ -222,16 +220,17 @@ public class TradeBroker {
 	 */
 	public boolean buildBestTradeOffer(Player otherPlayer) {
 		TradeBroker otherBroker = new TradeBroker(otherPlayer);
-		OwnableTile mostWanted, otherMostWanted;
-		int wantedSet, otherWantedSet; // 1-8 = colored properties; 9 = railroad; 10 = utility
-		Tile.TileType wantedSetType, otherWantedSetType; // to avoid long lines later
+		OwnableTile mostWanted;
+		OwnableTile otherMostWanted;
+		int wantedSet;
+		int otherWantedSet; // 1-8 = colored properties; 9 = railroad; 10 = utility
+		Tile.TileType wantedSetType;
+		Tile.TileType otherWantedSetType; // to avoid long lines later
 
-		{
-			ArrayList<OwnableTile> ranked = mostWantedProperties();
-			ArrayList<OwnableTile> otherRanked = otherBroker.mostWantedProperties();
-			mostWanted = ranked.size() > 0 ? mostWantedProperties().get(0) : null;
-			otherMostWanted = otherRanked.size() > 0 ? otherBroker.mostWantedProperties().get(0) : null;
-		}
+		ArrayList<OwnableTile> ranked = (ArrayList<OwnableTile>)mostWantedProperties();
+		ArrayList<OwnableTile> otherRanked = (ArrayList<OwnableTile>)otherBroker.mostWantedProperties();
+		mostWanted = !ranked.isEmpty() ? mostWantedProperties().get(0) : null;
+		otherMostWanted = !otherRanked.isEmpty() ? otherBroker.mostWantedProperties().get(0) : null;
 
 		if (mostWanted == null || otherMostWanted == null)
 			return false;
@@ -300,9 +299,8 @@ public class TradeBroker {
 				if (cashOffer > 0) {
 					if (client.getBalance() - cashOffer < 300)
 						return false;
-				} else if (cashOffer < 0) {
-					if (otherPlayer.getBalance() + cashOffer < 300)
-						return false;
+				} else if (cashOffer < 0 && otherPlayer.getBalance() + cashOffer < 300) {
+					return false;
 				}
 
 				deal.execute();

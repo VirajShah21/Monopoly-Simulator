@@ -1,6 +1,8 @@
 package org.virajshah.monopoly.core;
 
 import java.util.ArrayList;
+import java.util.List;
+
 import org.virajshah.monopoly.tiles.FreeParkingTile;
 import org.virajshah.monopoly.tiles.OwnableTile;
 import org.virajshah.monopoly.tiles.PropertyTile;
@@ -20,6 +22,9 @@ import org.virajshah.monopoly.logs.Logger;
  */
 
 public class Player {
+	private static final String PAYING_RENT_TO = "%s is paying rent to %s on %s.";
+	private static final String IS_PURCHASING = "%s is purchasing %s";
+	
 	/**
 	 * The name of this player
 	 */
@@ -62,11 +67,6 @@ public class Player {
 	private boolean inJail;
 
 	/**
-	 * The amount of money unable to deduct from player's balance
-	 */
-	private int unpaidBalances;
-
-	/**
 	 * The logger object associated with the current game
 	 */
 	private Logger logger;
@@ -86,7 +86,6 @@ public class Player {
 		getOutOfJailCards = 0;
 		inJail = false;
 		turnsInJail = 0;
-		unpaidBalances = 0;
 		logger = thisGame.getLogger();
 	}
 
@@ -164,8 +163,8 @@ public class Player {
 	 *
 	 * @return The ArrayList of assets belonging to this player.
 	 */
-	public ArrayList<OwnableTile> getAssets() {
-		return assets != null ? assets : new ArrayList<OwnableTile>();
+	public List<OwnableTile> getAssets() {
+		return assets != null ? assets : new ArrayList<>();
 	}
 
 	/**
@@ -193,7 +192,7 @@ public class Player {
 	 * 
 	 * @return An ArrayList of PropertyTiles belonging to a player
 	 */
-	public ArrayList<PropertyTile> getProperties() {
+	public List<PropertyTile> getProperties() {
 		ArrayList<PropertyTile> list = new ArrayList<>();
 
 		for (OwnableTile asset : assets) {
@@ -210,7 +209,7 @@ public class Player {
 	 * 
 	 * @return An ArrayList of RailroadTiles belonging to a player
 	 */
-	public ArrayList<RailroadTile> getRailroads() {
+	public List<RailroadTile> getRailroads() {
 		ArrayList<RailroadTile> list = new ArrayList<>();
 
 		for (OwnableTile asset : assets) {
@@ -227,7 +226,7 @@ public class Player {
 	 * 
 	 * @return An ArrayList of UtilityTiles belonging to a player
 	 */
-	public ArrayList<UtilityTile> getUtilities() {
+	public List<UtilityTile> getUtilities() {
 		ArrayList<UtilityTile> list = new ArrayList<>();
 
 		for (OwnableTile asset : assets) {
@@ -289,10 +288,10 @@ public class Player {
 
 			if (!tile.isOwned()) {
 				tile.buy(this);
-				logger.info(String.format("%s is purchasing %s", name, currTile.getName()));
+				logger.info(String.format(IS_PURCHASING, name, currTile.getName()));
 			} else if (tile.getOwner() != this) {
 				game.payRent(this, tile, moveAmount);
-				logger.info(String.format("%s is paying rent to %s on %s.", name, tile.getOwner(), tile.getName()));
+				logger.info(String.format(PAYING_RENT_TO, name, tile.getOwner(), tile.getName()));
 			}
 		} else if (currTile.getType() == TileType.CHANCE) {
 			Card chanceCard = Card.pickRandomCard(Card.chanceDeck);
@@ -303,10 +302,10 @@ public class Player {
 				OwnableTile tile = (OwnableTile) currTile;
 				if (!tile.isOwned()) {
 					tile.buy(this);
-					logger.info(String.format("%s is purchasing %s", name, currTile.getName()));
+					logger.info(String.format(IS_PURCHASING, name, currTile.getName()));
 				} else if (tile.getOwner() != this) {
 					game.payRent(this, tile, moveAmount);
-					logger.info(String.format("%s is paying rent to %s on %s.", name, tile.getOwner(), tile.getName()));
+					logger.info(String.format(PAYING_RENT_TO, name, tile.getOwner(), tile.getName()));
 				}
 			}
 		} else if (currTile.getType() == TileType.COMMUNITY_CHEST) {
@@ -318,10 +317,10 @@ public class Player {
 				OwnableTile tile = (OwnableTile) currTile;
 				if (!tile.isOwned()) {
 					tile.buy(this);
-					logger.info(String.format("%s is purchasing %s", name, currTile.getName()));
+					logger.info(String.format(IS_PURCHASING, name, currTile.getName()));
 				} else if (tile.getOwner() != this) {
 					game.payRent(this, tile, moveAmount);
-					logger.info(String.format("%s is paying rent to %s on %s.", name, tile.getOwner(), tile.getName()));
+					logger.info(String.format(PAYING_RENT_TO, name, tile.getOwner(), tile.getName()));
 				}
 			}
 		} else if (currTile.getType() == TileType.GO_TO_JAIL) {
@@ -371,7 +370,7 @@ public class Player {
 
 		for (int i = assets.size() - 1; i >= 0; i--) {
 			// If un-mortgage amount is less than a quarter of balance
-			if ((assets.get(i).getPropertyValue() / 2) * 1.1 < 0.25 * balance) {
+			if (((double)assets.get(i).getPropertyValue() / 2) * 1.1 < 0.25 * balance) {
 				assets.get(i).unmortgage();
 				logger.info(String.format("%s unmortgaged %s", name, assets.get(i).getName()));
 			}
@@ -390,7 +389,7 @@ public class Player {
 
 		for (OwnableTile a : assets) {
 			if (a.getType() == TileType.PROPERTY) {
-				total += ((PropertyTile) a).getHouses();
+				total += ((PropertyTile) a).getNumberOfHouses();
 			}
 		}
 
@@ -483,7 +482,7 @@ public class Player {
 	 * @return The amount of money added to the player's balance
 	 */
 	public int addBalance(int amount) {
-		ArrayList<Player> players = getGame().getPlayers();
+		ArrayList<Player> players = (ArrayList<Player>)(getGame()).getPlayers();
 		int circulation = 0;
 		for (Player p : players)
 			circulation += p.getBalance();
@@ -492,7 +491,7 @@ public class Player {
 			return amount;
 		} else {
 			balance += 20580 - circulation;
-			return amount;
+			return 20580 - circulation;
 		}
 	}
 

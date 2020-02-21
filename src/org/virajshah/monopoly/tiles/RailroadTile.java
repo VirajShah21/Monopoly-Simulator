@@ -21,6 +21,7 @@ public class RailroadTile extends OwnableTile {
 	/**
 	 * Mortgages the railroad
 	 */
+	@Override
 	public void mortgage() {
 		owner.addBalance(propertyValue / 2);
 		mortgaged = true;
@@ -31,7 +32,7 @@ public class RailroadTile extends OwnableTile {
 	 */
 	public ArrayList<RailroadTile> getMonopolySet() {
 		if (!isMonopoly())
-			return null;
+			return new ArrayList<>();
 
 		ArrayList<RailroadTile> railroads = new ArrayList<>();
 
@@ -63,7 +64,7 @@ public class RailroadTile extends OwnableTile {
 		int railsOwned = 0;
 
 		for (Tile asset : owner.getAssets())
-			if (asset.TYPE == TileType.RAILROAD)
+			if (asset.type == TileType.RAILROAD)
 				railsOwned++;
 
 		return getRent(railsOwned);
