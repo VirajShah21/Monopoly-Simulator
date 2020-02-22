@@ -24,7 +24,7 @@ import org.virajshah.monopoly.logs.Logger;
 public class Player {
 	private static final String PAYING_RENT_TO = "%s is paying rent to %s on %s.";
 	private static final String IS_PURCHASING = "%s is purchasing %s";
-	
+
 	/**
 	 * The name of this player
 	 */
@@ -238,6 +238,102 @@ public class Player {
 		return list;
 	}
 
+	private void purchaseOrPayRent(int diceRoll) {
+		Tile currTile = game.tileAt(position);
+		if (currTile.getType() == TileType.PROPERTY || currTile.getType() == TileType.RAILROAD
+				|| currTile.getType() == TileType.UTILITY) {
+			OwnableTile tile = (OwnableTile) currTile;
+
+			if (!tile.isOwned()) {
+				tile.buy(this);
+				logger.info(String.format(IS_PURCHASING, name, currTile.getName()));
+			} else if (tile.getOwner() != this) {
+				game.payRent(this, tile, diceRoll);
+				logger.info(String.format(PAYING_RENT_TO, name, tile.getOwner(), tile.getName()));
+			}
+		}
+	}
+
+	private void pickupCardIfRequired(int diceRoll) {
+		Tile currTile = game.tileAt(position);
+		int currPos = position;
+		if (currTile.getType() == TileType.CHANCE) {
+			Card chanceCard = Card.pickRandomCard(Card.chanceDeck);
+			chanceCard.pickup(this);
+			if (currPos != position)
+				purchaseOrPayRent(diceRoll);
+		} else if (currTile.getType() == TileType.COMMUNITY_CHEST) {
+			Card ccCard = Card.pickRandomCard(Card.communityChestDeck);
+			ccCard.pickup(this);
+			if (currPos != position)
+				purchaseOrPayRent(diceRoll);
+		}
+	}
+
+	private void payTaxes() {
+		if (game.tileAt(position).getType() == TileType.TAX) {
+			if (position == 4) {
+				deductBalance(200);
+				((FreeParkingTile) game.tileAt(20)).addToPool(200);
+			} else if (position == 38) {
+				deductBalance(100);
+				((FreeParkingTile) game.tileAt(20)).addToPool(100);
+			}
+		}
+	}
+
+	private void autoBuyHouses(TradeBroker broker) {
+		broker.sortAssetsByWorth();
+
+		for (OwnableTile asset : assets) {
+			if (asset.getType() == TileType.PROPERTY) {
+				PropertyTile property = (PropertyTile) asset;
+
+				while (property.getHousePrice() < 0.25 * balance && !property.hasHotel() && property.allowedToBuild()) {
+					property.buyHouse();
+					logger.info(String.format("%s bought a house on %s", name, property.getName()));
+				}
+			}
+		}
+	}
+
+	private void autoUnmortgage(TradeBroker broker) {
+		// If player can, un-mortgage properties, then do all this:
+		broker.sortAssetsByWorth();
+
+		for (int i = assets.size() - 1; i >= 0; i--) {
+			// If un-mortgage amount is less than a quarter of balance
+			if (((double) assets.get(i).getPropertyValue() / 2) * 1.1 < 0.25 * balance) {
+				assets.get(i).unmortgage();
+				logger.info(String.format("%s unmortgaged %s", name, assets.get(i).getName()));
+			}
+		}
+	}
+
+	private boolean checkJailStatus(int roll1, int roll2) {
+		if (inJail) {
+			turnsInJail++;
+			logger.info(String.format("%s is in jail. Time spent: %d turns", name, turnsInJail + 1));
+
+			if (roll1 == roll2) {
+				inJail = false;
+				turnsInJail = 0;
+				logger.info("\t Rolled doubles... breaking out of jail.");
+				return false;
+			} else if (turnsInJail == 4) {
+				inJail = false;
+				turnsInJail = 0;
+				logger.info("\t Sentence served.");
+				return false;
+			} else {
+				logger.info("\t End of turn.");
+				return true;
+			}
+		} else {
+			return false;
+		}
+	}
+
 	/**
 	 * Play the player's turn; this method takes everything into account when
 	 * playing a turn.
@@ -254,23 +350,8 @@ public class Player {
 
 		logger.info(String.format("%s rolled a %d and a %d. Moving %d spaces.", name, roll[0], roll[1], moveAmount));
 
-		if (inJail) {
-			turnsInJail++;
-			logger.info(String.format("%s is in jail. Time spent: %d turns", name, turnsInJail + 1));
-
-			if (roll[0] == roll[1]) {
-				inJail = false;
-				turnsInJail = 0;
-				logger.info("\t Rolled doubles... breaking out of jail.");
-			} else if (turnsInJail == 4) {
-				inJail = false;
-				turnsInJail = 0;
-				logger.info("\t Sentence served.");
-			} else {
-				logger.info("\t End of turn.");
-				return;
-			}
-		}
+		if (checkJailStatus(roll[0], roll[1]))
+			return;
 
 		position += moveAmount;
 
@@ -282,48 +363,11 @@ public class Player {
 
 		Tile currTile = game.tileAt(position);
 		logger.info(String.format("%s moved to %s.", name, currTile.getName()));
-		if (currTile.getType() == TileType.PROPERTY || currTile.getType() == TileType.RAILROAD
-				|| currTile.getType() == TileType.UTILITY) {
-			OwnableTile tile = (OwnableTile) currTile;
+		purchaseOrPayRent(moveAmount);
+		pickupCardIfRequired(moveAmount);
+		payTaxes();
 
-			if (!tile.isOwned()) {
-				tile.buy(this);
-				logger.info(String.format(IS_PURCHASING, name, currTile.getName()));
-			} else if (tile.getOwner() != this) {
-				game.payRent(this, tile, moveAmount);
-				logger.info(String.format(PAYING_RENT_TO, name, tile.getOwner(), tile.getName()));
-			}
-		} else if (currTile.getType() == TileType.CHANCE) {
-			Card chanceCard = Card.pickRandomCard(Card.chanceDeck);
-			chanceCard.pickup(this);
-
-			if (currTile.getType() == TileType.PROPERTY || currTile.getType() == TileType.RAILROAD
-					|| currTile.getType() == TileType.UTILITY) {
-				OwnableTile tile = (OwnableTile) currTile;
-				if (!tile.isOwned()) {
-					tile.buy(this);
-					logger.info(String.format(IS_PURCHASING, name, currTile.getName()));
-				} else if (tile.getOwner() != this) {
-					game.payRent(this, tile, moveAmount);
-					logger.info(String.format(PAYING_RENT_TO, name, tile.getOwner(), tile.getName()));
-				}
-			}
-		} else if (currTile.getType() == TileType.COMMUNITY_CHEST) {
-			Card ccCard = Card.pickRandomCard(Card.communityChestDeck);
-			ccCard.pickup(this);
-
-			if (currTile.getType() == TileType.PROPERTY || currTile.getType() == TileType.RAILROAD
-					|| currTile.getType() == TileType.UTILITY) {
-				OwnableTile tile = (OwnableTile) currTile;
-				if (!tile.isOwned()) {
-					tile.buy(this);
-					logger.info(String.format(IS_PURCHASING, name, currTile.getName()));
-				} else if (tile.getOwner() != this) {
-					game.payRent(this, tile, moveAmount);
-					logger.info(String.format(PAYING_RENT_TO, name, tile.getOwner(), tile.getName()));
-				}
-			}
-		} else if (currTile.getType() == TileType.GO_TO_JAIL) {
+		if (currTile.getType() == TileType.GO_TO_JAIL) {
 			setPosition(10);
 			goToJail();
 			logger.info(String.format("%s got sent to jail.", name));
@@ -332,14 +376,6 @@ public class Player {
 			this.addBalance(poolSize);
 			((FreeParkingTile) currTile).clearPool();
 			logger.info(String.format("%s landed on free parking.", name));
-		} else if (currTile.getType() == TileType.TAX) {
-			if (position == 4) {
-				deductBalance(200);
-				((FreeParkingTile) game.tileAt(20)).addToPool(200);
-			} else if (position == 38) {
-				deductBalance(100);
-				((FreeParkingTile) game.tileAt(20)).addToPool(100);
-			}
 		}
 
 		if (!isBankrupt())
@@ -347,34 +383,14 @@ public class Player {
 				while (broker.buildBestTradeOffer(p))
 					;
 
-		broker.sortAssetsByWorth();
-
-		for (OwnableTile asset : assets) {
-			if (asset.getType() == TileType.PROPERTY) {
-				PropertyTile property = (PropertyTile) asset;
-
-				while (property.getHousePrice() < 0.25 * balance && !property.hasHotel() && property.allowedToBuild()) {
-					property.buyHouse();
-					logger.info(String.format("%s bought a house on %s", name, property.getName()));
-				}
-			}
-		}
+		autoBuyHouses(broker);
 
 		if (roll[0] == roll[1]) {
 			logger.info(String.format("Since %s rolled double. They are going again", name));
 			playTurn();
 		}
 
-		// If player can, un-mortgage properties, then do all this:
-		broker.sortAssetsByWorth();
-
-		for (int i = assets.size() - 1; i >= 0; i--) {
-			// If un-mortgage amount is less than a quarter of balance
-			if (((double)assets.get(i).getPropertyValue() / 2) * 1.1 < 0.25 * balance) {
-				assets.get(i).unmortgage();
-				logger.info(String.format("%s unmortgaged %s", name, assets.get(i).getName()));
-			}
-		}
+		autoUnmortgage(broker);
 
 		if (balance == -1) {
 			game.getPlayers().remove(this);
@@ -412,42 +428,10 @@ public class Player {
 
 		broker.sortAssetsByWorth();
 
-		if (amount > balance) {
-			for (int i = assets.size() - 1; i >= 0 && amount > balance; i--) {
-				if (!assets.get(i).isMonopoly() && !assets.get(i).isMortgaged()
-						&& assets.get(i).getType() != TileType.PROPERTY) {
-					assets.get(i).mortgage();
-				}
-
-				if (i == 0)
-					break;
-			}
-		}
-
-		broker.sortAssetsByWorth();
-
-		if (amount > balance) {
-			for (int i = assets.size() - 1; i >= 0 && amount > balance; i--) {
-				if (!assets.get(i).isMonopoly() && !assets.get(i).isMortgaged()) {
-					assets.get(i).mortgage();
-				}
-
-				if (i == 0)
-					break;
-			}
-		}
-
-		broker.sortAssetsByWorth();
-
-		if (amount > balance) {
-			for (int i = assets.size() - 1; i >= 0 && amount > balance; i--) {
-				if (!assets.get(i).isMortgaged()) {
-					assets.get(i).mortgage();
-				}
-
-				if (i == 0)
-					break;
-			}
+		for (int i = assets.size() - 1; i >= 0 && amount > balance; i--) {
+			assets.get(i).mortgage();
+			if (i == 0)
+				break;
 		}
 
 	}
@@ -482,7 +466,7 @@ public class Player {
 	 * @return The amount of money added to the player's balance
 	 */
 	public int addBalance(int amount) {
-		ArrayList<Player> players = (ArrayList<Player>)(getGame()).getPlayers();
+		ArrayList<Player> players = (ArrayList<Player>) (getGame()).getPlayers();
 		int circulation = 0;
 		for (Player p : players)
 			circulation += p.getBalance();

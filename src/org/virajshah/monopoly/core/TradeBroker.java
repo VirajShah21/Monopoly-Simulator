@@ -26,12 +26,7 @@ public class TradeBroker {
 		this.client = client;
 	}
 
-	/**
-	 * @return A HashMap of how complete each monopoly set is
-	 */
-	private HashMap<OwnableTile, Double> getSetCompletions() {
-		HashMap<OwnableTile, Double> completionRates = new HashMap<>();
-
+	private void computePropertySetCompletion(HashMap<OwnableTile, Double> completionRates) {
 		for (OwnableTile asset : client.getAssets()) {
 			if (asset.getType() == Tile.TileType.PROPERTY) {
 				int group = ((PropertyTile) asset).getGroupNumber();
@@ -43,20 +38,45 @@ public class TradeBroker {
 						count++;
 				}
 				completionRates.put(asset, (double) count / setMaxCount);
+			}
+		}
+	}
+
+	private void computeRailroadSetCompletion(HashMap<OwnableTile, Double> completionRates) {
+		for (OwnableTile asset : client.getAssets()) {
+			int count = 0;
+			for (OwnableTile comparableAsset : client.getAssets()) {
+				if (comparableAsset.getType() == Tile.TileType.RAILROAD)
+					count++;
+			}
+			completionRates.put(asset, (double) count / 4.0);
+		}
+	}
+
+	private void computeUtilitySetCompletion(HashMap<OwnableTile, Double> completionRates) {
+		for (OwnableTile asset : client.getAssets()) {
+			int count = 0;
+			for (OwnableTile comparableAsset : client.getAssets()) {
+				if (comparableAsset.getType() == Tile.TileType.UTILITY)
+					count++;
+			}
+			completionRates.put(asset, (double) count / 2.0);
+		}
+	}
+
+	/**
+	 * @return A HashMap of how complete each monopoly set is
+	 */
+	private HashMap<OwnableTile, Double> getSetCompletions() {
+		HashMap<OwnableTile, Double> completionRates = new HashMap<>();
+
+		for (OwnableTile asset : client.getAssets()) {
+			if (asset.getType() == Tile.TileType.PROPERTY) {
+				computePropertySetCompletion(completionRates);
 			} else if (asset.getType() == Tile.TileType.RAILROAD) {
-				int count = 0;
-				for (OwnableTile comparableAsset : client.getAssets()) {
-					if (comparableAsset.getType() == Tile.TileType.RAILROAD)
-						count++;
-				}
-				completionRates.put(asset, (double) count / 4.0);
+				computeRailroadSetCompletion(completionRates);
 			} else if (asset.getType() == Tile.TileType.UTILITY) {
-				int count = 0;
-				for (OwnableTile comparableAsset : client.getAssets()) {
-					if (comparableAsset.getType() == Tile.TileType.UTILITY)
-						count++;
-				}
-				completionRates.put(asset, (double) count / 2.0);
+				computeUtilitySetCompletion(completionRates);
 			}
 		}
 
@@ -137,11 +157,11 @@ public class TradeBroker {
 	 */
 	public List<OwnableTile> mostWantedProperties() {
 		double completionThreshold = 0.5;
-		ArrayList<OwnableTile> wanted = (ArrayList<OwnableTile>)mostWantedProperties(completionThreshold);
+		ArrayList<OwnableTile> wanted = (ArrayList<OwnableTile>) mostWantedProperties(completionThreshold);
 
 		while (wanted.isEmpty() && completionThreshold >= 0) {
 			completionThreshold -= 0.1;
-			wanted = (ArrayList<OwnableTile>)mostWantedProperties(completionThreshold);
+			wanted = (ArrayList<OwnableTile>) mostWantedProperties(completionThreshold);
 		}
 
 		return wanted;
@@ -211,6 +231,25 @@ public class TradeBroker {
 	}
 
 	/**
+	 * 
+	 * @param tile An asset (? extends OwnableTile)
+	 * @return The set number (group number for properties; 9 for railroads; 10 for
+	 *         utilities
+	 */
+	private static int getAssetSetNumber(OwnableTile tile) {
+		switch (tile.getType()) {
+		case PROPERTY:
+			return ((PropertyTile) tile).getGroupNumber();
+		case RAILROAD:
+			return 9;
+		case UTILITY:
+			return 10;
+		default:
+			return 0;
+		}
+	}
+
+	/**
 	 * Builds the best possible trade for the client (and for another specified
 	 * player
 	 * 
@@ -224,88 +263,38 @@ public class TradeBroker {
 		OwnableTile otherMostWanted;
 		int wantedSet;
 		int otherWantedSet; // 1-8 = colored properties; 9 = railroad; 10 = utility
-		Tile.TileType wantedSetType;
-		Tile.TileType otherWantedSetType; // to avoid long lines later
 
-		ArrayList<OwnableTile> ranked = (ArrayList<OwnableTile>)mostWantedProperties();
-		ArrayList<OwnableTile> otherRanked = (ArrayList<OwnableTile>)otherBroker.mostWantedProperties();
+		ArrayList<OwnableTile> ranked = (ArrayList<OwnableTile>) mostWantedProperties();
+		ArrayList<OwnableTile> otherRanked = (ArrayList<OwnableTile>) otherBroker.mostWantedProperties();
 		mostWanted = !ranked.isEmpty() ? mostWantedProperties().get(0) : null;
 		otherMostWanted = !otherRanked.isEmpty() ? otherBroker.mostWantedProperties().get(0) : null;
 
 		if (mostWanted == null || otherMostWanted == null)
 			return false;
 
-		if (mostWanted.getType() == Tile.TileType.PROPERTY)
-			wantedSet = ((PropertyTile) mostWanted).getGroupNumber();
-		else if (mostWanted.getType() == Tile.TileType.RAILROAD)
-			wantedSet = 9;
-		else if (mostWanted.getType() == Tile.TileType.UTILITY)
-			wantedSet = 10;
-		else
-			wantedSet = 0;
-
-		if (otherMostWanted.getType() == Tile.TileType.PROPERTY)
-			otherWantedSet = ((PropertyTile) otherMostWanted).getGroupNumber();
-		else if (otherMostWanted.getType() == Tile.TileType.RAILROAD)
-			otherWantedSet = 9;
-		else if (otherMostWanted.getType() == Tile.TileType.UTILITY)
-			otherWantedSet = 10;
-		else
-			otherWantedSet = 0;
-
-		if (wantedSet == 9)
-			wantedSetType = Tile.TileType.RAILROAD;
-		else if (wantedSet == 10)
-			wantedSetType = Tile.TileType.UTILITY;
-		else if (wantedSet >= 1 && wantedSet <= 8)
-			wantedSetType = Tile.TileType.PROPERTY;
-		else
-			wantedSetType = null;
-
-		if (otherWantedSet == 9)
-			otherWantedSetType = Tile.TileType.RAILROAD;
-		else if (otherWantedSet == 10)
-			otherWantedSetType = Tile.TileType.UTILITY;
-		else if (otherWantedSet >= 1 && otherWantedSet <= 8)
-			otherWantedSetType = Tile.TileType.PROPERTY;
-		else
-			otherWantedSetType = null;
+		wantedSet = getAssetSetNumber(mostWanted);
+		otherWantedSet = getAssetSetNumber(otherMostWanted);
 
 		if (wantedSet != otherWantedSet && wantedSet != 0 && otherWantedSet != 0) {
 			OwnableTile wantedAsset = null;
 			OwnableTile otherWantedAsset = null;
 
-			if (otherWantedSet < 9 && hasAssetFromSet(otherWantedSet))
-				otherWantedAsset = getPrimaryAssetFromSet(otherWantedSet);
-			else if (hasAssetFromSet(otherWantedSetType))
-				otherWantedAsset = getPrimaryAssetFromSet(otherWantedSetType);
+			otherWantedAsset = getPrimaryAssetFromSet(otherWantedSet);
+			wantedAsset = otherBroker.getPrimaryAssetFromSet(wantedSet);
 
-			if (otherWantedAsset != null) {
-				if (wantedSet < 9 && otherBroker.hasAssetFromSet(wantedSet))
-					wantedAsset = otherBroker.getPrimaryAssetFromSet(wantedSet);
-				else if (otherBroker.hasAssetFromSet(wantedSetType))
-					wantedAsset = otherBroker.getPrimaryAssetFromSet(wantedSetType);
+			int wantedAssetValue = (valueToClient(wantedAsset) + otherBroker.valueToClient(wantedAsset)) / 2;
+			int otherWantedAssetValue = (valueToClient(otherWantedAsset) + otherBroker.valueToClient(otherWantedAsset))
+					/ 2;
+			int cashOffer = wantedAssetValue - otherWantedAssetValue;
+			TradeOffer deal = new TradeOffer(client, otherPlayer, otherWantedAsset, wantedAsset, cashOffer);
 
-			}
+			// Check if the deal will bankrupt any players
+			if ((cashOffer > 0 && client.getBalance() - cashOffer < 300)
+					|| (cashOffer < 0 && otherPlayer.getBalance() + cashOffer < 300))
+				return false;
 
-			if (wantedAsset != null && otherWantedAsset != null) {
-				int wantedAssetValue = (valueToClient(wantedAsset) + otherBroker.valueToClient(wantedAsset)) / 2;
-				int otherWantedAssetValue = (valueToClient(otherWantedAsset)
-						+ otherBroker.valueToClient(otherWantedAsset)) / 2;
-				int cashOffer = wantedAssetValue - otherWantedAssetValue;
-				TradeOffer deal = new TradeOffer(client, otherPlayer, otherWantedAsset, wantedAsset, cashOffer);
-
-				// Check if the deal will bankrupt any players
-				if (cashOffer > 0) {
-					if (client.getBalance() - cashOffer < 300)
-						return false;
-				} else if (cashOffer < 0 && otherPlayer.getBalance() + cashOffer < 300) {
-					return false;
-				}
-
-				deal.execute();
-				return true;
-			}
+			deal.execute();
+			return true;
 		}
 		return false;
 	}

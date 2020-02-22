@@ -211,7 +211,7 @@ public class PropertyTile extends OwnableTile {
 
 	public void autoSellHouseOnMonopoly() {
 		if (isMonopoly()) {
-			ArrayList<PropertyTile> colorSet = (ArrayList<PropertyTile>)getMonopolySet();
+			ArrayList<PropertyTile> colorSet = (ArrayList<PropertyTile>) getMonopolySet();
 			PropertyTile highestProperty = this;
 
 			for (int i = 1; i < colorSet.size(); i++) {
@@ -252,8 +252,15 @@ public class PropertyTile extends OwnableTile {
 	 */
 	@Override
 	public String toString() {
-		String append = houses <= 4 && houses > 0 ? " (" + houses + " houses)" : (hasHotel() ? " (w/ Hotel)" : null);
-		return String.format("[%d]%s%s %s", group, name, append == null ? "" : append,
-				isMortgaged() ? "(Mortgaged)" : "");
+		String append;
+
+		if (houses <= 4 && houses > 0)
+			append = String.format("(%d houses)", houses);
+		else if (hasHotel())
+			append = "(w/ Hotel)";
+		else
+			append = "";
+
+		return String.format("[%d]%s %s %s", group, name, append, isMortgaged() ? "(Mortgaged)" : "");
 	}
 }

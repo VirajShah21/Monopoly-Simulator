@@ -66,9 +66,11 @@ public class Card {
 	public String getCall() {
 		return call;
 	}
-	
+
 	/**
-	 * Helper method for pickup(Player). It cleans the commands listed in the card info.
+	 * Helper method for pickup(Player). It cleans the commands listed in the card
+	 * info.
+	 * 
 	 * @param commands The array of commands to clean
 	 */
 	private void cleanCommands(String[] commands) {
@@ -83,7 +85,14 @@ public class Card {
 			commands[i] = currCall;
 		}
 	}
-	
+
+	/**
+	 * Helper method for pickup(Player). It advances a player to the specified tile
+	 * index
+	 * 
+	 * @param player   The player to be moved
+	 * @param location The tile index to move Player to
+	 */
 	private static void advancePlayerTo(Player player, int location) {
 		int advanceTo = location;
 
@@ -92,10 +101,17 @@ public class Card {
 
 		player.setPosition(advanceTo);
 	}
-	
+
+	/**
+	 * Helper method for pickup(Player). It advances a player to the nearest
+	 * railroad/utility
+	 * 
+	 * @param player The player to moved
+	 * @param place  'u' = nearest utility, 'r' = nearest railroad
+	 */
 	private static void advancePlayerTo(Player player, char place) {
 		int playerPos = player.getPosition();
-		
+
 		if (place == 'r') {
 			while (!(playerPos % 10 != 0 && playerPos % 5 == 0)) {
 				playerPos++;
@@ -116,6 +132,143 @@ public class Card {
 	}
 
 	/**
+	 * Counts the total number of hotels a specified player has
+	 * 
+	 * @param player The player to evaluate
+	 * @return The number of hotels the player has
+	 */
+	private static int getPlayerTotalHotels(Player player) {
+		int total = 0;
+		for (OwnableTile asset : player.getAssets())
+			if (asset.getType() == Tile.TileType.PROPERTY && ((PropertyTile) asset).hasHotel())
+				total++;
+		return total;
+	}
+
+	/**
+	 * Count the total number of houses a specified player has
+	 * 
+	 * @param player The player to evaluate
+	 * @return The number of houses the player has
+	 */
+	private static int getPlayerTotalHouses(Player player) {
+		int total = 0;
+		for (OwnableTile asset : player.getAssets())
+			if (asset.getType() == Tile.TileType.PROPERTY && !((PropertyTile) asset).hasHotel())
+				total += player.getNumberOfHouses();
+		return total;
+	}
+
+	/**
+	 * If the player must engage in a transaction (paying/getting money), do it
+	 * 
+	 * @param player The player in respect to the transaction
+	 * @param args   The call string
+	 */
+	private static void calledTransaction(Player player, String[] args) {
+		if (args[0].equals("earn")) {
+			if (args[1].equals("from-all")) {
+				ArrayList<Player> players = (ArrayList<Player>) (player.getGame().getPlayers());
+
+				int amount = Integer.parseInt(args[2]);
+				for (int i = 0; i < players.size(); i++) {
+					players.get(i).deductBalance(amount);
+				}
+
+				player.addBalance(amount * players.size());
+			} else {
+				player.addBalance(Integer.parseInt(args[1]));
+			}
+		} else if (args[0].equals("pay")) {
+			if (args[1].equals("all")) { // Money is distributed to each player
+				// The logic in this block works out perfectly
+				// 1.
+				int amount = Integer.parseInt(args[2]);
+				ArrayList<Player> otherPlayers = (ArrayList<Player>) (player.getGame().getPlayers());
+				player.deductBalance(amount * otherPlayers.size());
+				for (Player otherPlayer : otherPlayers) {
+					otherPlayer.addBalance(amount);
+				}
+			} else if (args[1].equals("buildings")) { // Money for houses and
+				// hotels; also goes to
+				// free parking.
+				int houseAmount = Integer.parseInt(args[2]) * getPlayerTotalHouses(player);
+				int hotelAmount = Integer.parseInt(args[3]) * getPlayerTotalHotels(player);
+				int totalFee = houseAmount + hotelAmount;
+
+				// Deduct balance from user
+				player.deductBalance(totalFee);
+				// Add money to the free parking tile
+				((FreeParkingTile) player.getGame().tileAt(20)).addToPool(totalFee);
+			} else { // The money goes to free parking
+				int amount = Integer.parseInt(args[1]);
+				player.deductBalance(amount);
+				((FreeParkingTile) player.getGame().tileAt(20)).addToPool(amount);
+				// Index 20 is the free parking tile on the board ^
+			}
+		}
+	}
+
+	/**
+	 * Call a jackpot (double rent) on a utility or railroad
+	 * 
+	 * @param player The player who landed on the jackpot
+	 * @param args   The call string
+	 */
+	private static void callJackpot(Player player, String[] args) {
+		if (args[0].equals("utility-jackpot")) {
+			UtilityTile utility = (UtilityTile) player.getGame().tileAt(player.getPosition());
+			if (utility.isOwned() && utility.getOwner() != player) {
+				int[] rolls = Dice.roll2();
+				int total = rolls[0] + rolls[1];
+				int amountPaid = total * 10;
+				player.deductBalance(amountPaid);
+				utility.getOwner().addBalance(amountPaid);
+			}
+		} else if (args[0].equals("railroad-jackpot")) {
+			RailroadTile railroad = (RailroadTile) player.getGame().tileAt(player.getPosition());
+			if (railroad.isOwned() && railroad.getOwner() != player) {
+				int amountPaid = railroad.getRent() * 2;
+				player.deductBalance(amountPaid);
+				railroad.getOwner().addBalance(amountPaid);
+			}
+		}
+	}
+
+	/**
+	 * Handles all the calls which can be linked to a community chest/chance card
+	 * 
+	 * @param player The player who picked up the card
+	 * @param call   The call string
+	 */
+	private static void handleCall(Player player, String call) {
+		String[] words = call.split(" ");
+
+		if (words[0].equals("advance")) {
+			if (words[1].equals("nearest"))
+				advancePlayerTo(player, words[2].charAt(0));
+			else
+				advancePlayerTo(player, Integer.parseInt(words[1]));
+		} else if (words[0].equals("goto")) {
+			player.setPosition(Integer.parseInt(words[1]));
+		} else if (words[0].equals("earn") || words[0].equals("pay")) {
+			calledTransaction(player, words);
+		} else if (words[0].equals("get-out-of-jail")) {
+			player.addGetOutOfJailCard();
+		} else if (words[0].equals("go-to-jail")) {
+			player.setPosition(10);
+			player.goToJail();
+		} else if (words[0].indexOf("-jackpot") >= 0) {
+			callJackpot(player, words);
+		} else if (words[0].equals("move")) {
+			int moveBy = Integer.parseInt(words[1]);
+			player.setPosition(player.getPosition() + moveBy);
+		} else {
+			logger.error("An unknown call has been found: " + words[0]);
+		}
+	}
+
+	/**
 	 * Runs Chance/Community Chest actions on the player once a player picks up the
 	 * card
 	 *
@@ -129,89 +282,7 @@ public class Card {
 
 		// Loop through the array of commands
 		for (String currCall : calls) {
-			String[] words = currCall.split(" ");
-
-			if (words[0].equals("advance")) {
-				if (words[1].equals("nearest"))
-					advancePlayerTo(player, words[2].charAt(0));
-				else
-					advancePlayerTo(player, Integer.parseInt(words[1]));
-			} else if (words[0].equals("goto")) {
-				player.setPosition(Integer.parseInt(words[1]));
-			} else if (words[0].equals("earn")) {
-				if (words[1].equals("from-all")) {
-					ArrayList<Player> players = (ArrayList<Player>)(player.getGame().getPlayers());
-
-					int amount = Integer.parseInt(words[2]);
-					for (int i = 0; i < players.size(); i++) {
-						players.get(i).deductBalance(amount);
-					}
-
-					player.addBalance(amount * players.size());
-				} else {
-					player.addBalance(Integer.parseInt(words[1]));
-				}
-			} else if (words[0].equals("pay")) {
-				if (words[1].equals("all")) { // Money is distributed to each player
-					// The logic in this block works out perfectly
-					// 1.
-					int amount = Integer.parseInt(words[2]);
-					ArrayList<Player> otherPlayers = (ArrayList<Player>)(player.getGame().getPlayers());
-					player.deductBalance(amount * otherPlayers.size());
-					for (Player otherPlayer : otherPlayers) {
-						otherPlayer.addBalance(amount);
-					}
-				} else if (words[1].equals("buildings")) { // Money for houses and
-					// hotels; also goes to
-					// free parking.
-					int houseAmount = Integer.parseInt(words[2]);
-					int hotelAmount = Integer.parseInt(words[3]);
-					int totalFee = 0;
-					for (OwnableTile asset : player.getAssets()) {
-						if (asset.getType() == Tile.TileType.PROPERTY) {
-							PropertyTile property = (PropertyTile) asset;
-							totalFee += property.hasHotel() ? hotelAmount : property.getNumberOfHouses() * houseAmount;
-
-						}
-					}
-
-					// Deduct balance from user
-					player.deductBalance(totalFee);
-					// Add money to the free parking tile
-					((FreeParkingTile) player.getGame().tileAt(20)).addToPool(totalFee);
-				} else { // The money goes to free parking
-					int amount = Integer.parseInt(words[1]);
-					player.deductBalance(amount);
-					((FreeParkingTile) player.getGame().tileAt(20)).addToPool(amount);
-					// Index 20 is the free parking tile on the board ^
-				}
-			} else if (words[0].equals("get-out-of-jail")) {
-				player.addGetOutOfJailCard();
-			} else if (words[0].equals("go-to-jail")) {
-				player.setPosition(10);
-				player.goToJail();
-			} else if (words[0].equals("utility-jackpot")) {
-				UtilityTile utility = (UtilityTile) player.getGame().tileAt(player.getPosition());
-				if (utility.isOwned() && utility.getOwner() != player) {
-					int[] rolls = Dice.roll2();
-					int total = rolls[0] + rolls[1];
-					int amountPaid = total * 10;
-					player.deductBalance(amountPaid);
-					utility.getOwner().addBalance(amountPaid);
-				}
-			} else if (words[0].equals("railroad-jackpot")) {
-				RailroadTile railroad = (RailroadTile) player.getGame().tileAt(player.getPosition());
-				if (railroad.isOwned() && railroad.getOwner() != player) {
-					int amountPaid = railroad.getRent() * 2;
-					player.deductBalance(amountPaid);
-					railroad.getOwner().addBalance(amountPaid);
-				}
-			} else if (words[0].equals("move")) {
-				int moveBy = Integer.parseInt(words[1]);
-				player.setPosition(player.getPosition() + moveBy);
-			} else {
-				logger.error("An unknown call has been found: " + words[0]);
-			}
+			handleCall(player, currCall);
 		}
 	}
 
@@ -227,9 +298,8 @@ public class Card {
 			new Card("Holiday Fund matures. Collect $100.", "earn 100;"),
 			new Card("Income tax refund. Collect $20.", "earn 20;"),
 			new Card("It's your birthday. Collect $10 from every player.", "earn from-all 10;"),
-			new Card("Life insurance matures. Collect $100", "earn 100;"),
-			new Card("Hospital Fees. Pay $50.", PAY_50), new Card("School Fees. Pay $50.", PAY_50),
-			new Card("Receive $25 consultancy fee.", "earn 25;"),
+			new Card("Life insurance matures. Collect $100", "earn 100;"), new Card("Hospital Fees. Pay $50.", PAY_50),
+			new Card("School Fees. Pay $50.", PAY_50), new Card("Receive $25 consultancy fee.", "earn 25;"),
 			new Card("You are assessed for street repairs: Pay $40 per house and $115 per hotel you own.",
 					"pay buildings 40 115"),
 			new Card("You have won second prize in a beauty contest. Collect $10.", "earn 10"),
