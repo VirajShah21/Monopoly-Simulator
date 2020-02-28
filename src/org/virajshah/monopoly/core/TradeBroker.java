@@ -1,6 +1,7 @@
 package org.virajshah.monopoly.core;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 import org.virajshah.monopoly.tiles.*;
 
@@ -132,9 +133,11 @@ public class TradeBroker {
 		HashMap<OwnableTile, Double> completionRates = getSetCompletions();
 		ArrayList<OwnableTile> wanted = new ArrayList<>();
 
-		for (OwnableTile asset : completionRates.keySet())
+		for (Entry<OwnableTile, Double> entry : completionRates.entrySet()) {
+			OwnableTile asset = entry.getKey();
 			if (completionRates.get(asset) >= completionThreshold)
 				wanted.add(asset);
+		}
 
 		for (int i = 0; i < wanted.size() - 1; i++) {
 			for (int j = i + 1; j < wanted.size(); j++) {
